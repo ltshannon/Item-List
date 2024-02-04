@@ -16,7 +16,7 @@ struct SignInView: View {
     
     var body: some View {
         VStack {
-            GoogleSignInButton(viewModel: GoogleSignInButtonViewModel(scheme: .dark, style: .wide, state: .normal)) {
+            GoogleSiginBtn {
                 Task {
                     do {
                         try await GoogleSignInService.shared.signInGoogle()

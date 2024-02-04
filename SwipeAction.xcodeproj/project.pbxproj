@@ -42,6 +42,7 @@
 		B1B512A02B6F46A8005DCC21 /* GoogleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B5129F2B6F46A8005DCC21 /* GoogleSignInService.swift */; };
 		B1B512A22B6F46E4005DCC21 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B512A12B6F46E4005DCC21 /* Utilities.swift */; };
 		B1B512A42B7038F8005DCC21 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B1B512A32B7038F8005DCC21 /* GoogleService-Info.plist */; };
+		B1B512A72B704C7E005DCC21 /* GoogleSiginBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B512A62B704C7D005DCC21 /* GoogleSiginBtn.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +60,7 @@
 		B1B512A12B6F46E4005DCC21 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		B1B512A32B7038F8005DCC21 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B1B512A52B7039C6005DCC21 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B1B512A62B704C7D005DCC21 /* GoogleSiginBtn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSiginBtn.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 				B1101FD02B6D60B8005E545E /* ItemDataModel.swift */,
 				B1B512962B6F42ED005DCC21 /* Authentication.swift */,
 				B1B5129F2B6F46A8005DCC21 /* GoogleSignInService.swift */,
+				B1B512A62B704C7D005DCC21 /* GoogleSiginBtn.swift */,
 				B1B512A32B7038F8005DCC21 /* GoogleService-Info.plist */,
 				B1101FC42B6C7E87005E545E /* Assets.xcassets */,
 				B1101FC62B6C7E87005E545E /* Preview Content */,
@@ -247,6 +250,7 @@
 				B1101FC32B6C7E86005E545E /* ContentView.swift in Sources */,
 				B1B512A22B6F46E4005DCC21 /* Utilities.swift in Sources */,
 				B1101FC12B6C7E86005E545E /* SwipeActionApp.swift in Sources */,
+				B1B512A72B704C7E005DCC21 /* GoogleSiginBtn.swift in Sources */,
 				B1B512972B6F42ED005DCC21 /* Authentication.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
