@@ -24,12 +24,15 @@ struct ListItemsView: View {
                 List {
                     ForEach(items, id: \.id) { item in
                         Text(item.name)
-                            .swipeActions() {
-                                Button("Delete", systemImage: "trash", role: .destructive) {
-                                    deleteName(id: item.id, key: key)
-                                }
-                            }
                     }
+                    .onMove(perform: move)
+                    .onDelete { indexSet in
+                        items.remove(atOffsets: indexSet)
+                        itemDataModel.save(key: key, items: items)
+                    }
+                }
+                .toolbar {
+                    EditButton()
                 }
                 if showGear == false {
                     HStack {
@@ -95,15 +98,12 @@ struct ListItemsView: View {
         itemDataModel.save(key: key, items: items)
     }
     
-    func deleteName(id: String, key: String) {
-        if let index = items.firstIndex(where: {$0.id == id}) {
-            items.remove(at: index)
-            itemDataModel.save(key: key, items: items)
-        }
-    }
-    
     func didDismiss() {
         items = itemDataModel.items
+    }
+    
+    func move(from source: IndexSet, to destination: Int) {
+        items.move(fromOffsets: source, toOffset: destination)
     }
 }
 
