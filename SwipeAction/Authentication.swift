@@ -21,6 +21,7 @@ class Authentication: ObservableObject {
     @Published var isGuestUser = false
     @Published var firebaseUserId = ""
     @Published var email: String = ""
+    @Published var fcmToken: String = ""
     
     enum AuthState: String {
         case waiting = "waiting"
@@ -70,12 +71,21 @@ class Authentication: ObservableObject {
                     self.firebaseUserId = user?.uid ?? ""
                     self.email = email
                 }
-//                Task {
-//                    await self.firebaseService.updateAddUsersDocument(token: self.fcmToken.isNotEmpty ? self.fcmToken : nil)
-//                }
+                //                Task {
+                //                    await self.firebaseService.updateAddUsersDocument(token: self.fcmToken.isNotEmpty ? self.fcmToken : nil)
+                //                }
                 
             case .loggedOut:
                 break
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name("FCMToken"), object: nil, queue: nil) { notification in
+            let newToken = notification.userInfo?["token"] as? String ?? ""
+            Task {
+                await MainActor.run {
+                    self.fcmToken = newToken
+                }
             }
         }
     }

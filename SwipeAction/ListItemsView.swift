@@ -16,7 +16,7 @@ struct ListItemsView: View {
     @State var items: [ItemData] = []
     var key: String
     var title: String
-    var showGear: Bool = true
+    var showShare: Bool = true
     
     var body: some View {
         NavigationStack {
@@ -34,14 +34,15 @@ struct ListItemsView: View {
                 .toolbar {
                     EditButton()
                 }
-                if showGear == false {
-                    HStack {
+                if showShare == false {
+                    VStack {
                         Button {
                             itemDataModel.setDefaults()
                             dismiss()
                         } label: {
                             Text("Restore Defaults")
                         }
+                        .buttonStyle(.bordered)
                     }
                 }
             }
@@ -54,19 +55,18 @@ struct ListItemsView: View {
                         Image(systemName: "plus")
                     }
                 }
-                if showGear == true {
+                if showShare == true {
                     ToolbarItem(placement: .confirmationAction) {
                         Button {
                             showingSheet = true
                         } label: {
-                            Image(systemName: "gear")
+                            Image(systemName: "square.and.arrow.up")
                         }
                     }
                 }
-                if showGear == false {
+                if showShare == false {
                     ToolbarItem(placement: .cancellationAction) {
                         Button {
-                            itemDataModel.restore(key: "currentItems")
                             dismiss()
                         } label: {
                             Text("Done")
@@ -82,7 +82,7 @@ struct ListItemsView: View {
                 Text("Enter item name")
             })
             .fullScreenCover(isPresented: $showingSheet, onDismiss: didDismiss) {
-                SettingsView()
+                ShareView()
             }
             .onAppear {
                 itemDataModel.restore(key: key)
@@ -99,7 +99,7 @@ struct ListItemsView: View {
     }
     
     func didDismiss() {
-        items = itemDataModel.items
+//        items = itemDataModel.items
     }
     
     func move(from source: IndexSet, to destination: Int) {

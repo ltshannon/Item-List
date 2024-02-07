@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import UIKit
+import SwiftUI
 
 class Utilities {
     static let shared = Utilities()
@@ -17,7 +17,11 @@ class Utilities {
     
     @MainActor
     func topViewController(controller: UIViewController? = nil) -> UIViewController? {
-        let controller = controller ?? UIApplication.shared.keyWindow?.rootViewController
+        let controller = controller ?? UIApplication
+            .shared
+            .connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+            .last?.rootViewController
         if let navigationController = controller as? UINavigationController {
             return topViewController(controller: navigationController.visibleViewController)
         }
@@ -32,4 +36,33 @@ class Utilities {
         return controller
     }
     
+}
+
+extension Font {
+    static let buttonText: Font = Font.system(size: 19, weight: .regular).leading(.loose)
+}
+
+public extension String {
+    //Common
+    static var empty: String { "" }
+    static var space: String { " " }
+    static var comma: String { "," }
+    static var newline: String { "\n" }
+    
+    //Debug
+    static var success: String { "🎉" }
+    static var test: String { "🧪" }
+    static var notice: String { "⚠️" }
+    static var warning: String { "🚧" }
+    static var fatal: String { "☢️" }
+    static var reentry: String { "⛔️" }
+    static var stop: String { "🛑" }
+    static var boom: String { "💥" }
+    static var sync: String { "🚦" }
+    static var key: String { "🗝" }
+    static var bell: String { "🔔" }
+    
+    var isNotEmpty: Bool {
+        !isEmpty
+    }
 }

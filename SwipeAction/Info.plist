@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>GIDClientID</key>
-	<string>3110552740-qvk8mbfdcro336p4gepupodute3e4hv6.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -14,6 +12,14 @@
 				<string>com.googleusercontent.apps.3110552740-qvk8mbfdcro336p4gepupodute3e4hv6</string>
 			</array>
 		</dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>3110552740-qvk8mbfdcro336p4gepupodute3e4hv6.apps.googleusercontent.com</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
 	</array>
 </dict>
 </plist>
