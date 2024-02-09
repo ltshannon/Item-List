@@ -8,6 +8,11 @@
 import Foundation
 import SwiftUI
 
+enum ListItemType: String {
+    case currentItems = "currentItems"
+    case defaultItems = "defaultItems"
+}
+
 class Utilities {
     static let shared = Utilities()
     

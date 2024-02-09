@@ -53,7 +53,7 @@ struct SettingsView: View {
             }
             .padding([.leading, .trailing])
             .fullScreenCover(isPresented: $showDefaultSheet) {
-                ListItemsView(key: "defaultItems", title: "Default Items", showShare: false)
+                ListItemsView(key: ListItemType.defaultItems, title: "Default Items", showShare: false)
             }
             .fullScreenCover(isPresented: $showProfileSheet) {
                 ProfileView()

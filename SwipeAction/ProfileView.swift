@@ -86,7 +86,6 @@ struct ProfileView: View {
                 if let url = userAuth.user?.photoURL {
                     profileURL = url.absoluteString
                 }
-                debugPrint(String.boom, "user: \(user.displayName ?? "n/a")")
             }
         }
         .onChange(of: avatarItem) {

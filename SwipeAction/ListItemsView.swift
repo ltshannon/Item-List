@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct ListItemsView: View {
-    @EnvironmentObject var itemDataModel: ItemDataModel
+    @EnvironmentObject var firebaseService: FirebaseService
+    @EnvironmentObject var userAuth: Authentication
     @Environment(\.dismiss) var dismiss
     @State var showingAlert = false
+    @State var showingAlert2 = false
     @State var showingSheet = false
     @State var name = ""
     @State var items: [ItemData] = []
-    var key: String
+    var key: ListItemType
     var title: String
     var showShare: Bool = true
     
@@ -27,8 +29,12 @@ struct ListItemsView: View {
                     }
                     .onMove(perform: move)
                     .onDelete { indexSet in
-                        items.remove(atOffsets: indexSet)
-                        itemDataModel.save(key: key, items: items)
+                        let index = indexSet[indexSet.startIndex]
+                        let name = items[index].name
+                        Task {
+                            await deleteItem(key: key, item: name)
+                        }
+                        
                     }
                 }
                 .toolbar {
@@ -37,7 +43,7 @@ struct ListItemsView: View {
                 if showShare == false {
                     VStack {
                         Button {
-                            itemDataModel.setDefaults()
+                            restoreDefaults()
                             dismiss()
                         } label: {
                             Text("Restore Defaults")
@@ -76,30 +82,75 @@ struct ListItemsView: View {
             }
             .alert("Add item", isPresented: $showingAlert, actions: {
                 TextField("Name", text: $name)
-                Button("Save", action: { saveName(key: key) })
+                Button("Save", action: {
+                    Task {
+                        await saveName(key: key)
+                    }
+                })
                 Button("Cancel", role: .cancel, action: {})
             }, message: {
                 Text("Enter item name")
             })
+            .alert("Name already in list", isPresented: $showingAlert2) {
+                Button("OK", role: .cancel) { }
+            }
             .fullScreenCover(isPresented: $showingSheet, onDismiss: didDismiss) {
                 ShareView()
             }
-            .onAppear {
-                itemDataModel.restore(key: key)
-                items = itemDataModel.items
+            .onReceive(firebaseService.$users) { items in
+                if let user = userAuth.user {
+                    let userId = user.uid
+                    for item in items {
+                        if userId == item.id {
+                            var temp: [String]?
+                            switch key {
+                            case .currentItems:
+                                temp = item.currentItems
+                            case .defaultItems:
+                                temp = item.defaultItems
+                            }
+                            if let currentItems = temp {
+                                var array: [ItemData] = []
+                                for item in currentItems {
+                                    let new = ItemData(id: UUID().uuidString, name: item)
+                                    array.append(new)
+                                }
+                                DispatchQueue.main.async {
+                                    self.items = array
+                                }
+                                return
+                            }
+                        }
+                    }
+                }
             }
         }
     }
     
-    func saveName(key: String) {
-        let item = ItemData(name: name)
-        items.append(item)
+    func restoreDefaults() {
+        
+        let data = items.map { $0.name }
+        Task {
+            await firebaseService.restoreDefault(items: data)
+        }
+    }
+    
+    func deleteItem(key: ListItemType, item: String) async {
+        await firebaseService.deleteItem(key: key, item: item)
+    }
+    
+    func saveName(key: ListItemType) async {
+        if items.contains(where: { $0.name == name }) {
+            showingAlert2 = true
+            name = ""
+            return
+        }
+        await firebaseService.updateItems(key: key, item: name)
         name = ""
-        itemDataModel.save(key: key, items: items)
     }
     
     func didDismiss() {
-//        items = itemDataModel.items
+
     }
     
     func move(from source: IndexSet, to destination: Int) {
@@ -108,5 +159,5 @@ struct ListItemsView: View {
 }
 
 #Preview {
-    ListItemsView(key: "currentItems", title: "Items")
+    ListItemsView(key: ListItemType.currentItems, title: "Items")
 }

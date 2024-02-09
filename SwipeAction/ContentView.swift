@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct ContentView: View {
     @EnvironmentObject var userAuth: Authentication
     @EnvironmentObject var firebaseService: FirebaseService
@@ -15,11 +14,17 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            ListItemsView(key: "currentItems", title: "Items")
+            ListItemsView(key: ListItemType.currentItems, title: "Items")
                 .tabItem {
                     Label("My List", systemImage: "list.dash")
                 }
                 .tag(1)
+            SharedListView()
+                .tabItem {
+                    Label("Shared Lists", systemImage: "list.dash")
+                }
+                .tag(2)
+            
 //            ListItemsView(key: "defaultItems", title: "Default Items", showShare: false)
 //                .tabItem {
 //                    Label("Default List", systemImage: "list.dash")

@@ -49,6 +49,7 @@
 		B1B512B02B72A6EA005DCC21 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B512AF2B72A6EA005DCC21 /* ShareView.swift */; };
 		B1B512CC2B73E0BA005DCC21 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B512CB2B73E0BA005DCC21 /* ProfileView.swift */; };
 		B1B512CF2B73EC12005DCC21 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B512CE2B73EC12005DCC21 /* StorageService.swift */; };
+		B1B512D12B759D8A005DCC21 /* SharedListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B512D02B759D8A005DCC21 /* SharedListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,6 +75,7 @@
 		B1B512AF2B72A6EA005DCC21 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
 		B1B512CB2B73E0BA005DCC21 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		B1B512CE2B73EC12005DCC21 /* StorageService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		B1B512D02B759D8A005DCC21 /* SharedListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,11 +141,9 @@
 				B1B512982B6F44D4005DCC21 /* SignInView.swift */,
 				B1B512652B6DB402005DCC21 /* ListItemsView.swift */,
 				B1B512AF2B72A6EA005DCC21 /* ShareView.swift */,
+				B1B512D02B759D8A005DCC21 /* SharedListView.swift */,
 				B1B512CB2B73E0BA005DCC21 /* ProfileView.swift */,
-				B1101FD02B6D60B8005E545E /* ItemDataModel.swift */,
-				B1B512962B6F42ED005DCC21 /* Authentication.swift */,
 				B1B512A62B704C7D005DCC21 /* GoogleSignInBtn.swift */,
-				B1B512AC2B719E0E005DCC21 /* FirebaseService.swift */,
 				B1B512A12B6F46E4005DCC21 /* Utilities.swift */,
 				B1B512AA2B7193E5005DCC21 /* ButtonStyles.swift */,
 				B1B512A32B7038F8005DCC21 /* GoogleService-Info.plist */,
@@ -164,6 +164,9 @@
 		B1B512CD2B73EBF4005DCC21 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				B1B512962B6F42ED005DCC21 /* Authentication.swift */,
+				B1B512AC2B719E0E005DCC21 /* FirebaseService.swift */,
+				B1101FD02B6D60B8005E545E /* ItemDataModel.swift */,
 				B1B5129F2B6F46A8005DCC21 /* GoogleSignInService.swift */,
 				B1B512CE2B73EC12005DCC21 /* StorageService.swift */,
 			);
@@ -285,6 +288,7 @@
 				B1B512B02B72A6EA005DCC21 /* ShareView.swift in Sources */,
 				B1101FC12B6C7E86005E545E /* SwipeActionApp.swift in Sources */,
 				B1B512A72B704C7E005DCC21 /* GoogleSignInBtn.swift in Sources */,
+				B1B512D12B759D8A005DCC21 /* SharedListView.swift in Sources */,
 				B1B512972B6F42ED005DCC21 /* Authentication.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

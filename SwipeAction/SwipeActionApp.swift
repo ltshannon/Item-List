@@ -89,14 +89,12 @@ class AppDelegate: NSObject,  UIApplicationDelegate, MessagingDelegate, UNUserNo
 @main
 struct SwipeActionApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject var itemDataModel = ItemDataModel()
     @StateObject var userAuth = Authentication.shared
     @StateObject var firebaseService = FirebaseService.shared
     
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(itemDataModel)
                 .environmentObject(userAuth)
                 .environmentObject(firebaseService)
         }

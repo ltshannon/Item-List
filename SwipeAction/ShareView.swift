@@ -18,6 +18,7 @@ struct ShareView: View {
     @Environment(\.dismiss) var dismiss
     @State var showingSheet = false
     @State var showingAlert = false
+    @State var showingAlert2 = false
     @State var users: [NameList] = []
     @State var addUserId = ""
     
@@ -31,7 +32,10 @@ struct ShareView: View {
                     }
                     .onMove(perform: move)
                     .onDelete { indexSet in
+                        let index = indexSet[indexSet.startIndex]
+                        let id = users[index].id
                         users.remove(atOffsets: indexSet)
+                        deleteSharedUser(id: id)
                     }
                 }
             }
@@ -55,9 +59,30 @@ struct ShareView: View {
             .onAppear {
                 users = []
                 for item in firebaseService.users {
-                    if let id = item.id, id == userAuth.firebaseUserId, let users = item.sharedTo {
-                        let names = users.map { getUserName(id: $0) }
+                    if let id = item.id, id == userAuth.firebaseUserId, let users = item.sharedWith {
+                        let names = users.compactMap { getUserName(id: $0) }
                         self.users = names
+                    }
+                }
+            }
+            .onReceive(firebaseService.$users) { items in
+                if let user = userAuth.user {
+                    for item in items {
+                        if user.uid == item.id {
+                            var array: [NameList] = []
+                            if let sharedTo = item.sharedWith, sharedTo.count > 0 {
+                                let _ = sharedTo.map { sharedItem in
+                                    let sharedUser = findUserFrom(id: sharedItem)
+                                    let nameList = NameList(id: sharedItem, name: sharedUser?.displayName ?? "n/a")
+                                    array.append(nameList)
+                                    return true
+                                }
+                                DispatchQueue.main.async {
+                                    self.users = array
+                                }
+                                return
+                            }
+                        }
                     }
                 }
             }
@@ -65,6 +90,9 @@ struct ShareView: View {
                 ConnectionView(addUserId: $addUserId)
             }
             .alert("Name already in list", isPresented: $showingAlert) {
+                Button("OK", role: .cancel) { }
+            }
+            .alert("Can not share to yourself", isPresented: $showingAlert2) {
                 Button("OK", role: .cancel) { }
             }
         }
@@ -79,11 +107,11 @@ struct ShareView: View {
         return nil
     }
     
-    func getUserName(id: String) -> NameList {
+    func getUserName(id: String) -> NameList? {
         if let item = findUserFrom(id: id), let userId = item.id, let name = item.displayName {
             return NameList(id: userId, name: name)
         }
-        return NameList(id: UUID().uuidString, name: "n/a")
+        return nil
     }
     
     func move(from source: IndexSet, to destination: Int) {
@@ -91,18 +119,26 @@ struct ShareView: View {
     }
     
     func didDismiss() {
+        if let user = userAuth.user, user.uid == addUserId {
+            showingAlert2 = true
+            return
+        }
         if let _ = users.firstIndex(where: { $0.id == addUserId }) {
             showingAlert = true
             return
         }
-        let nameList = getUserName(id: addUserId)
-        users.append(nameList)
-//        if let user = findUserFrom(id: addUserId) {
-//
-//        }
-//        if let index = users.firstIndex(where: { $0.id == addUserId }) {
-//            users.remove(at: index)
-//        }
+        if let nameList = getUserName(id: addUserId) {
+            users.append(nameList)
+            Task {
+                await firebaseService.updateShared(id: addUserId)
+            }
+        }
+    }
+    
+    func deleteSharedUser(id: String) {
+        Task {
+            await firebaseService.deleteShared(id: id)
+        }
     }
 }
 
