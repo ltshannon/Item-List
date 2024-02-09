@@ -16,9 +16,21 @@ struct ListItemsView: View {
     @State var showingSheet = false
     @State var name = ""
     @State var items: [ItemData] = []
+    var userId: String = ""
     var key: ListItemType
     var title: String
     var showShare: Bool = true
+    var showDone: Bool = true
+    var showRestore: Bool = false
+    
+    init(userId: String = "", key: ListItemType, title: String, showShare: Bool = true, showDone: Bool = true, showRestore: Bool = false) {
+        self.userId = userId
+        self.key = key
+        self.title = title
+        self.showShare = showShare
+        self.showDone = showDone
+        self.showRestore = showRestore
+    }
     
     var body: some View {
         NavigationStack {
@@ -40,7 +52,7 @@ struct ListItemsView: View {
                 .toolbar {
                     EditButton()
                 }
-                if showShare == false {
+                if showRestore == true {
                     VStack {
                         Button {
                             restoreDefaults()
@@ -98,8 +110,7 @@ struct ListItemsView: View {
                 ShareView()
             }
             .onReceive(firebaseService.$users) { items in
-                if let user = userAuth.user {
-                    let userId = user.uid
+                if let userId = getUserId() {
                     for item in items {
                         if userId == item.id {
                             var temp: [String]?
@@ -108,6 +119,8 @@ struct ListItemsView: View {
                                 temp = item.currentItems
                             case .defaultItems:
                                 temp = item.defaultItems
+                            case .sharedItems:
+                                temp = item.currentItems
                             }
                             if let currentItems = temp {
                                 var array: [ItemData] = []
@@ -124,6 +137,18 @@ struct ListItemsView: View {
                     }
                 }
             }
+        }
+    }
+    
+    func getUserId() -> String? {
+        switch key {
+        case .currentItems, .defaultItems:
+            if let user = userAuth.user {
+                return user.uid
+            }
+            return nil
+        case .sharedItems:
+            return userId
         }
     }
     
@@ -159,5 +184,5 @@ struct ListItemsView: View {
 }
 
 #Preview {
-    ListItemsView(key: ListItemType.currentItems, title: "Items")
+    ListItemsView(userId: "", key: ListItemType.currentItems, title: "Items")
 }

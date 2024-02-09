@@ -11,6 +11,7 @@ import SwiftUI
 enum ListItemType: String {
     case currentItems = "currentItems"
     case defaultItems = "defaultItems"
+    case sharedItems = "sharedItems"
 }
 
 class Utilities {

@@ -10,12 +10,19 @@ import SwiftUI
 struct SharedListView: View {
     @EnvironmentObject var firebaseService: FirebaseService
     @State var nameList: [NameList] = []
+    @State var showingSheet = false
+    @State var userId = ""
 
     var body: some View {
         VStack {
             List {
                 ForEach(nameList, id: \.id) { item in
                     Text(item.name)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            userId = item.id
+                            showingSheet = true
+                        }
                 }
             }
         }
@@ -35,6 +42,9 @@ struct SharedListView: View {
             DispatchQueue.main.async {
                 self.nameList = array
             }
+        }
+        .fullScreenCover(isPresented: $showingSheet) {
+            ListItemsView(userId: userId, key: ListItemType.sharedItems, title: "Items", showShare: false, showDone: true)
         }
     }
 }

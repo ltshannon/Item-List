@@ -11,6 +11,7 @@ struct ContentView: View {
     @EnvironmentObject var userAuth: Authentication
     @EnvironmentObject var firebaseService: FirebaseService
     @State private var showSignIn: Bool = false
+    @State var userId = ""
     
     var body: some View {
         TabView {
