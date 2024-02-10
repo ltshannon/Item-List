@@ -16,12 +16,12 @@ struct ListItemsView: View {
     @State var showingSheet = false
     @State var name = ""
     @State var items: [ItemData] = []
-    var userId: String = ""
+    var userId: String
     var key: ListItemType
     var title: String
-    var showShare: Bool = true
-    var showDone: Bool = true
-    var showRestore: Bool = false
+    var showShare: Bool
+    var showDone: Bool
+    var showRestore: Bool
     
     init(userId: String = "", key: ListItemType, title: String, showShare: Bool = true, showDone: Bool = true, showRestore: Bool = false) {
         self.userId = userId
@@ -82,7 +82,7 @@ struct ListItemsView: View {
                         }
                     }
                 }
-                if showShare == false {
+                if showDone == true {
                     ToolbarItem(placement: .cancellationAction) {
                         Button {
                             dismiss()
@@ -161,7 +161,11 @@ struct ListItemsView: View {
     }
     
     func deleteItem(key: ListItemType, item: String) async {
-        await firebaseService.deleteItem(key: key, item: item)
+        if let userId = getUserId() {
+            await firebaseService.deleteItem(userId: userId, key: key == .sharedItems ? .currentItems : key, item: item)
+        } else {
+            debugPrint(String.boom, "ListItemsView deleteItem could not get userId")
+        }
     }
     
     func saveName(key: ListItemType) async {
@@ -170,7 +174,11 @@ struct ListItemsView: View {
             name = ""
             return
         }
-        await firebaseService.updateItems(key: key, item: name)
+        if let userId = getUserId() {
+            await firebaseService.updateItems(userId: userId, key: key == .sharedItems ? .currentItems : key, item: name)
+        } else {
+            debugPrint(String.boom, "ListItemsView saveNamecould not get userId")
+        }
         name = ""
     }
     

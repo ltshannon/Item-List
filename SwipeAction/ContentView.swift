@@ -15,7 +15,7 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            ListItemsView(key: ListItemType.currentItems, title: "Items")
+            ListItemsView(key: ListItemType.currentItems, title: "Items", showDone: false)
                 .tabItem {
                     Label("My List", systemImage: "list.dash")
                 }

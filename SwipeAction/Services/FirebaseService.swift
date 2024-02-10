@@ -132,27 +132,25 @@ class FirebaseService: ObservableObject {
         }
     }
     
-    func deleteItem(key: ListItemType, item: String) async {
-        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+    func deleteItem(userId: String, key: ListItemType, item: String) async {
         
         let value = [
                     key.rawValue : FieldValue.arrayRemove([item])
                     ]
         do {
-            try await database.collection("users").document(currentUid).updateData(value)
+            try await database.collection("users").document(userId).updateData(value)
         } catch {
             debugPrint(String.boom, "deleteItem: \(error)")
         }
     }
     
-    func updateItems(key: ListItemType, item: String) async {
-        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+    func updateItems(userId: String, key: ListItemType, item: String) async {
         
         let value = [
                     key.rawValue : FieldValue.arrayUnion([item])
                     ]
         do {
-            try await database.collection("users").document(currentUid).updateData(value)
+            try await database.collection("users").document(userId).updateData(value)
         } catch {
             debugPrint(String.boom, "updateItems: \(error)")
         }

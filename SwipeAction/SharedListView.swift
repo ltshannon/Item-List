@@ -14,37 +14,35 @@ struct SharedListView: View {
     @State var userId = ""
 
     var body: some View {
-        VStack {
-            List {
-                ForEach(nameList, id: \.id) { item in
-                    Text(item.name)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            userId = item.id
-                            showingSheet = true
+        NavigationStack {
+            VStack {
+                List {
+                    ForEach(nameList, id: \.id) { item in
+                        NavigationLink(item.name) {
+                            ListItemsView(userId: item.id, key: ListItemType.sharedItems, title: "Items", showShare: false, showDone: true)
+                                .navigationBarBackButtonHidden(true)
                         }
+                    }
                 }
             }
-        }
-        .onAppear {
-            Task {
-                await firebaseService.getSharedUsers()
-            }
-        }
-        .onReceive(firebaseService.$sharingUsers) { items in
-            var array: [NameList] = []
-            for item in items {
-                if let id = item.id, let name = item.displayName {
-                    let nameList = NameList(id: id, name: name)
-                    array.append(nameList)
+            .navigationTitle("Shared")
+            .onAppear {
+                Task {
+                    await firebaseService.getSharedUsers()
                 }
             }
-            DispatchQueue.main.async {
-                self.nameList = array
+            .onReceive(firebaseService.$sharingUsers) { items in
+                var array: [NameList] = []
+                for item in items {
+                    if let id = item.id, let name = item.displayName {
+                        let nameList = NameList(id: id, name: name)
+                        array.append(nameList)
+                    }
+                }
+                DispatchQueue.main.async {
+                    self.nameList = array
+                }
             }
-        }
-        .fullScreenCover(isPresented: $showingSheet) {
-            ListItemsView(userId: userId, key: ListItemType.sharedItems, title: "Items", showShare: false, showDone: true)
         }
     }
 }

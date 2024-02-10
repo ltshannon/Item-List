@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct PlainTextButtonStyle: ButtonStyle {
-    var backgroundColor: Color = Color(.white)
-    var foregroundColor: Color = Color(.black)
+    var backgroundColor: Color = Color("SettingBackground")
+    var foregroundColor: Color = Color("SettingsForeground")
     var verticalPadding: CGFloat = 10.0
 
     func makeBody(configuration: Self.Configuration) -> some View {
