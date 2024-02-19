@@ -16,6 +16,8 @@ struct ListItemsView: View {
     @State var showingSheet = false
     @State var name = ""
     @State var items: [ItemData] = []
+    @State var selectedUser: NameList = NameList(id: "n/a", name: "n/a")
+    @State var showingAlert2Text = ""
     var userId: String
     var key: ListItemType
     var title: String
@@ -38,19 +40,32 @@ struct ListItemsView: View {
                 List {
                     ForEach(items, id: \.id) { item in
                         Text(item.name)
+                            .swipeActions(edge: .trailing) {
+                                if key != .sharedItems {
+                                    Button {
+                                        Task {
+                                            await deleteItem(key: key, item: item.name)
+                                        }
+                                    } label: {
+                                        Text("Delete")
+                                    }
+                                }
+                            }
+                            .swipeActions(edge: .leading) {
+                                if key == .sharedItems {
+                                    Button {
+                                        name = item.name
+                                        Task {
+                                            await saveName(key: .currentItems)
+                                            name = ""
+                                        }
+                                    } label: {
+                                        Text("Add item to my list")
+                                    }
+                                }
+                            }
                     }
                     .onMove(perform: move)
-                    .onDelete { indexSet in
-                        let index = indexSet[indexSet.startIndex]
-                        let name = items[index].name
-                        Task {
-                            await deleteItem(key: key, item: name)
-                        }
-                        
-                    }
-                }
-                .toolbar {
-                    EditButton()
                 }
                 if showRestore == true {
                     VStack {
@@ -64,13 +79,20 @@ struct ListItemsView: View {
                     }
                 }
             }
-            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showingAlert = true
-                    } label: {
-                        Image(systemName: "plus")
+                ToolbarItem(placement: .principal) {
+                    HStack {
+                        Text(title).font(key == .sharedItems ? .subheadline : .title)
+                    }
+                }
+                if key != .sharedItems {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            showingAlert = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }
                     }
                 }
                 if showShare == true {
@@ -103,37 +125,33 @@ struct ListItemsView: View {
             }, message: {
                 Text("Enter item name")
             })
-            .alert("Name already in list", isPresented: $showingAlert2) {
+            .alert(showingAlert2Text, isPresented: $showingAlert2) {
                 Button("OK", role: .cancel) { }
             }
-            .fullScreenCover(isPresented: $showingSheet, onDismiss: didDismiss) {
+            .fullScreenCover(isPresented: $showingSheet) {
                 ShareView()
             }
             .onReceive(firebaseService.$users) { items in
-                if let userId = getUserId() {
-                    for item in items {
-                        if userId == item.id {
-                            var temp: [String]?
-                            switch key {
-                            case .currentItems:
-                                temp = item.currentItems
-                            case .defaultItems:
-                                temp = item.defaultItems
-                            case .sharedItems:
-                                temp = item.currentItems
-                            }
-                            if let currentItems = temp {
-                                var array: [ItemData] = []
-                                for item in currentItems {
-                                    let new = ItemData(id: UUID().uuidString, name: item)
-                                    array.append(new)
-                                }
-                                DispatchQueue.main.async {
-                                    self.items = array
-                                }
-                                return
-                            }
+                if let userId = getUserId(), let item = items.filter({ $0.id == userId }).first {
+                    var temp: [String]?
+                    switch key {
+                    case .currentItems:
+                        temp = item.currentItems
+                    case .defaultItems:
+                        temp = item.defaultItems
+                    case .sharedItems:
+                        temp = item.currentItems
+                    }
+                    if let currentItems = temp {
+                        var array: [ItemData] = []
+                        for item in currentItems {
+                            let new = ItemData(id: UUID().uuidString, name: item)
+                            array.append(new)
                         }
+                        DispatchQueue.main.async {
+                            self.items = array
+                        }
+                        return
                     }
                 }
             }
@@ -153,7 +171,6 @@ struct ListItemsView: View {
     }
     
     func restoreDefaults() {
-        
         let data = items.map { $0.name }
         Task {
             await firebaseService.restoreDefault(items: data)
@@ -168,22 +185,44 @@ struct ListItemsView: View {
         }
     }
     
+    func getCurrentItems() -> [ItemData]? {
+        if let user = userAuth.user, let currentUser = firebaseService.users.filter({ $0.id == user.uid }).first, let currentItems = currentUser.currentItems  {
+            var array: [ItemData] = []
+            for item in currentItems {
+                let new = ItemData(id: UUID().uuidString, name: item)
+                array.append(new)
+            }
+            return array
+        }
+        return nil
+    }
+    
     func saveName(key: ListItemType) async {
-        if items.contains(where: { $0.name == name }) {
+        if name.isEmpty {
+            showingAlert2Text = "No item to add"
+            showingAlert2 = true
+            return
+        }
+        var temp: [ItemData] = []
+        if self.key == .sharedItems {
+            if let items = getCurrentItems() {
+                temp = items
+            }
+        } else {
+            temp = items
+        }
+        if temp.contains(where: { $0.name == name }) {
+            showingAlert2Text = "Name already in list"
             showingAlert2 = true
             name = ""
             return
         }
-        if let userId = getUserId() {
-            await firebaseService.updateItems(userId: userId, key: key == .sharedItems ? .currentItems : key, item: name)
+        if let user = userAuth.user {
+            await firebaseService.updateItems(userId: user.uid, key: key == .sharedItems ? .currentItems : key, item: name)
         } else {
-            debugPrint(String.boom, "ListItemsView saveNamecould not get userId")
+            debugPrint(String.boom, "ListItemsView saveName could not get userId")
         }
         name = ""
-    }
-    
-    func didDismiss() {
-
     }
     
     func move(from source: IndexSet, to destination: Int) {

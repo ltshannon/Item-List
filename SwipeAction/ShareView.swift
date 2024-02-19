@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NameList: Identifiable {
+struct NameList: Codable, Identifiable, Hashable {
     var id: String
     var name: String
 }
@@ -25,7 +25,6 @@ struct ShareView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                Text("You are sharing to these users:")
                 List {
                     ForEach(users, id: \.id) { item in
                         Text(item.name)
@@ -39,8 +38,13 @@ struct ShareView: View {
                     }
                 }
             }
-            .navigationTitle("Share Your Items")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack {
+                        Text("You are sharing to these users:").font(.headline)
+                    }
+                }
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
                         dismiss()

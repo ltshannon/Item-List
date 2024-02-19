@@ -15,17 +15,21 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            ListItemsView(key: ListItemType.currentItems, title: "Items", showDone: false)
+            ListItemsView(key: ListItemType.currentItems, title: "Your Items List", showDone: false)
                 .tabItem {
                     Label("My List", systemImage: "list.dash")
                 }
                 .tag(1)
+            MoreListsView()
+                .tabItem {
+                    Label("More Lists", systemImage: "list.dash")
+                }
+                .tag(2)
             SharedListView()
                 .tabItem {
                     Label("Shared Lists", systemImage: "list.dash")
                 }
-                .tag(2)
-            
+                .tag(3)
 //            ListItemsView(key: "defaultItems", title: "Default Items", showShare: false)
 //                .tabItem {
 //                    Label("Default List", systemImage: "list.dash")

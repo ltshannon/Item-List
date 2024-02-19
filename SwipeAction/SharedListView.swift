@@ -19,13 +19,20 @@ struct SharedListView: View {
                 List {
                     ForEach(nameList, id: \.id) { item in
                         NavigationLink(item.name) {
-                            ListItemsView(userId: item.id, key: ListItemType.sharedItems, title: "Items", showShare: false, showDone: true)
+                            ListItemsView(userId: item.id, key: ListItemType.sharedItems, title: "\(item.name)'s Items", showShare: false, showDone: true)
                                 .navigationBarBackButtonHidden(true)
                         }
                     }
                 }
             }
-            .navigationTitle("Shared")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack {
+                        Text("These people are sharing to you:").font(.title2)
+                    }
+                }
+            }
             .onAppear {
                 Task {
                     await firebaseService.getSharedUsers()

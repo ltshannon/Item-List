@@ -32,8 +32,13 @@ struct ConnectionView: View {
                     }
                 }
             }
-            .navigationTitle("Users")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack {
+                        Text("Select a user you can share too").font(.headline)
+                    }
+                }
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
                         dismiss()

@@ -23,12 +23,43 @@ struct UserInformation: Codable, Identifiable, Hashable {
     var defaultItems: [String]?
 }
 
+struct MoreLists: Codable, Identifiable, Hashable {
+    @DocumentID var id: String?
+    var listNames: [NameList] = []
+    var lists: [[String: [NameList]]] = [[:]]
+}
+
+extension MoreLists {
+    init(snapshot: Dictionary<String, Any>) {
+        let items = snapshot["lists"] as? [String] ?? []
+        var nameLists: [NameList] = []
+        let _ = items.map {
+            let nameItem = NameList(id: UUID().uuidString, name: $0)
+            nameLists.append(nameItem)
+        }
+        listNames = nameLists
+        var temp: [[String: [NameList]]] = []
+        for item in items {
+            let list = snapshot[item] as? [String] ?? []
+            var nameLists: [NameList] = []
+            for element in list {
+                let nameItem = NameList(id: UUID().uuidString, name: element)
+                nameLists.append(nameItem)
+            }
+            temp.append([item: nameLists])
+        }
+        lists = temp
+    }
+}
+
 class FirebaseService: ObservableObject {
     static let shared = FirebaseService()
     @AppStorage("profile-url") var profileURL: String = ""
     @Published var users: [UserInformation] = []
     @Published var sharingUsers: [UserInformation] = []
+    @Published var moreLists: MoreLists = MoreLists()
     private var userListener: ListenerRegistration?
+    private var moreListsListener: ListenerRegistration?
     
     func getUsers() {
         
@@ -55,6 +86,22 @@ class FirebaseService: ObservableObject {
 
         }
         userListener = listener
+    }
+    
+    func getMoreLists(docID: String) {
+        
+        let moreLists = database.collection("moreLists").document(docID).addSnapshotListener { documentSnapshot, error in
+                
+            guard let document = documentSnapshot, let _ = document.data() else {
+                print("setupListenerForMessageThread: Error fetching document: \(docID)")
+                return
+            }
+            let lists = MoreLists(snapshot: document.data() ?? [:])
+            DispatchQueue.main.async {
+                self.moreLists = lists
+            }
+        }
+            moreListsListener = moreLists
     }
     
     func getSharedUsers() async {
@@ -141,6 +188,42 @@ class FirebaseService: ObservableObject {
             try await database.collection("users").document(userId).updateData(value)
         } catch {
             debugPrint(String.boom, "deleteItem: \(error)")
+        }
+    }
+    
+    func deleteMoreItem(userId: String, listName: String, item: String) async {
+        
+        let value = [
+                    listName : FieldValue.arrayRemove([item])
+                    ]
+        do {
+            try await database.collection("moreLists").document(userId).updateData(value)
+        } catch {
+            debugPrint(String.boom, "deleteItem moreLists: \(error)")
+        }
+    }
+    
+    func deleteFieldFromMoreItems(docID: String, listName: String) async -> Bool {
+        do {
+          try await database.collection("moreLists").document(docID).updateData([
+            listName: FieldValue.delete(),
+          ])
+            return true
+        } catch {
+            debugPrint(String.boom, "Error deleteFieldFromMoreItems: \(error)")
+            return false
+        }
+    }
+    
+    func updateItemsForMoreItems(userId: String, listName: String, item: String) async {
+        
+        let value = [
+                    listName : FieldValue.arrayUnion([item])
+                    ]
+        do {
+            try await database.collection("moreLists").document(userId).updateData(value)
+        } catch {
+            debugPrint(String.boom, "updateItemsForMoreItems: \(error)")
         }
     }
     
