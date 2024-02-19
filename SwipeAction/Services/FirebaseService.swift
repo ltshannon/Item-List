@@ -265,4 +265,24 @@ class FirebaseService: ObservableObject {
         }
     }
     
+    func callFirebaseCallableFunction(fcm: String, title: String, body: String, silent: Bool) {
+        lazy var functions = Functions.functions()
+        
+        let payload = [
+                        "silent": silent,
+                        "fcm": fcm,
+                        "title": title,
+                        "body": body
+        ] as [String : Any]
+        functions.httpsCallable("sendNotification").call(payload) { result, error in
+            if let error = error as NSError? {
+                debugPrint(String.boom, "Errror callFirebaseCallableFunction \(error.localizedDescription)")
+            }
+            if let data = result?.data {
+                debugPrint("result: \(data)")
+            }
+            
+        }
+    }
+    
 }

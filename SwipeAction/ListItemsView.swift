@@ -87,7 +87,7 @@ struct ListItemsView: View {
                         Text(title).font(key == .sharedItems ? .subheadline : .title)
                     }
                 }
-                if key != .sharedItems {
+//                if key != .sharedItems {
                     ToolbarItem(placement: .primaryAction) {
                         Button {
                             showingAlert = true
@@ -95,7 +95,7 @@ struct ListItemsView: View {
                             Image(systemName: "plus")
                         }
                     }
-                }
+//                }
                 if showShare == true {
                     ToolbarItem(placement: .confirmationAction) {
                         Button {
@@ -199,7 +199,7 @@ struct ListItemsView: View {
     }
     
     func getCurrentItems() -> [ItemData]? {
-        if let user = userAuth.user, let currentUser = firebaseService.users.filter({ $0.id == user.uid }).first, let currentItems = currentUser.currentItems  {
+        if let user = getUserId(), let currentUser = firebaseService.users.filter({ $0.id == user }).first, let currentItems = currentUser.currentItems  {
             var array: [ItemData] = []
             for item in currentItems {
                 let new = ItemData(id: UUID().uuidString, name: item)
@@ -230,8 +230,14 @@ struct ListItemsView: View {
             name = ""
             return
         }
-        if let user = userAuth.user {
-            await firebaseService.updateItems(userId: user.uid, key: key == .sharedItems ? .currentItems : key, item: name)
+        if let user = getUserId() {
+            await firebaseService.updateItems(userId: user, key: key == .sharedItems ? .currentItems : key, item: name)
+            if key == .sharedItems {
+                let user = firebaseService.users.filter({ $0.id == userId }).first
+                if let fcm = user?.fcm,  let currentUser = userAuth.user, let displayName = currentUser.displayName {
+                    firebaseService.callFirebaseCallableFunction(fcm: fcm, title: "\(displayName)", body: "Is adding this to your list: \(name)", silent: false)
+                }
+            }
         } else {
             debugPrint(String.boom, "ListItemsView saveName could not get userId")
         }
