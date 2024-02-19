@@ -30,19 +30,11 @@ struct ContentView: View {
                     Label("Shared Lists", systemImage: "list.dash")
                 }
                 .tag(3)
-//            ListItemsView(key: "defaultItems", title: "Default Items", showShare: false)
-//                .tabItem {
-//                    Label("Default List", systemImage: "list.dash")
-//                }
-//                .tag(3)
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
                 .tag(4)
-        }
-        .onAppear {
-            firebaseService.getUsers()
         }
         .onReceive(userAuth.$state) { state in
             debugPrint("😍", "ContentView onReceive userAtuh.state: \(state)")

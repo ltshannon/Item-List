@@ -58,8 +58,8 @@ class FirebaseService: ObservableObject {
     @Published var users: [UserInformation] = []
     @Published var sharingUsers: [UserInformation] = []
     @Published var moreLists: MoreLists = MoreLists()
-    private var userListener: ListenerRegistration?
     private var moreListsListener: ListenerRegistration?
+    var userListener: ListenerRegistration?
     
     func getUsers() {
         

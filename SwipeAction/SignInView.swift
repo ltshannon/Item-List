@@ -11,6 +11,7 @@ import GoogleSignInSwift
 import AuthenticationServices
 
 struct SignInView: View {
+    @EnvironmentObject var firebaseService: FirebaseService
     @EnvironmentObject var userAuth: Authentication
     @Environment(\.dismiss) var dismiss
     
@@ -21,6 +22,7 @@ struct SignInView: View {
                     do {
                         try await GoogleSignInService.shared.signInGoogle()
                         debugPrint("🦁", "user signed in with goolge")
+                        firebaseService.getUsers()
                     } catch {
                         debugPrint("", "GoogleSignInService return error: \(error.localizedDescription)")
                     }

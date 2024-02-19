@@ -18,6 +18,7 @@ struct ListItemsView: View {
     @State var items: [ItemData] = []
     @State var selectedUser: NameList = NameList(id: "n/a", name: "n/a")
     @State var showingAlert2Text = ""
+    @State var firstTime = true
     var userId: String
     var key: ListItemType
     var title: String
@@ -131,29 +132,41 @@ struct ListItemsView: View {
             .fullScreenCover(isPresented: $showingSheet) {
                 ShareView()
             }
-            .onReceive(firebaseService.$users) { items in
-                if let userId = getUserId(), let item = items.filter({ $0.id == userId }).first {
-                    var temp: [String]?
-                    switch key {
-                    case .currentItems:
-                        temp = item.currentItems
-                    case .defaultItems:
-                        temp = item.defaultItems
-                    case .sharedItems:
-                        temp = item.currentItems
+            .onAppear {
+                if firstTime {
+                    if firebaseService.userListener == nil {
+                        firebaseService.getUsers()
                     }
-                    if let currentItems = temp {
-                        var array: [ItemData] = []
-                        for item in currentItems {
-                            let new = ItemData(id: UUID().uuidString, name: item)
-                            array.append(new)
-                        }
-                        DispatchQueue.main.async {
-                            self.items = array
-                        }
-                        return
-                    }
+                    firstTime = false
                 }
+            }
+            .onReceive(firebaseService.$users) { items in
+                processUsers(users: items)
+            }
+        }
+    }
+    
+    func processUsers(users: [UserInformation]) {
+        if let userId = getUserId(), let item = users.filter({ $0.id == userId }).first {
+            var temp: [String]?
+            switch key {
+            case .currentItems:
+                temp = item.currentItems
+            case .defaultItems:
+                temp = item.defaultItems
+            case .sharedItems:
+                temp = item.currentItems
+            }
+            if let currentItems = temp {
+                var array: [ItemData] = []
+                for item in currentItems {
+                    let new = ItemData(id: UUID().uuidString, name: item)
+                    array.append(new)
+                }
+                DispatchQueue.main.async {
+                    self.items = array
+                }
+                return
             }
         }
     }
