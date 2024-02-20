@@ -10,6 +10,8 @@ import SwiftUI
 struct ItemData: Identifiable {
     var id: String = UUID().uuidString
     var name: String
+    var isStrikethrough = false
+    var imageName = "square"
 }
 
 class ItemDataModel: ObservableObject {

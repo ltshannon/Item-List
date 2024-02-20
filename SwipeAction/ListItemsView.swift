@@ -42,9 +42,11 @@ struct ListItemsView: View {
             VStack {
                 List {
                     ForEach(items, id: \.id) { item in
-                        Text(item.name)
-                            .swipeActions(edge: .trailing) {
-                                if key != .sharedItems {
+                        HStack {
+                            Image(systemName: item.imageName)
+                            Text(item.name)
+                                .strikethrough(item.isStrikethrough)
+                                .swipeActions(edge: .trailing) {
                                     Button {
                                         Task {
                                             await deleteItem(key: key, item: item.name)
@@ -54,9 +56,7 @@ struct ListItemsView: View {
                                     }
                                     .tint(.red)
                                 }
-                            }
-                            .swipeActions(edge: .trailing) {
-                                if key != .sharedItems {
+                                .swipeActions(edge: .trailing) {
                                     Button {
                                         oldName = item.name
                                         name = item.name
@@ -65,20 +65,30 @@ struct ListItemsView: View {
                                         Text("Edit")
                                     }
                                 }
-                            }
-                            .swipeActions(edge: .leading) {
-                                if key == .sharedItems {
-                                    Button {
-                                        name = item.name
-                                        Task {
-                                            await saveName(key: .currentItems)
-                                            name = ""
+                                .swipeActions(edge: .leading) {
+                                    if key == .sharedItems {
+                                        Button {
+                                            name = item.name
+                                            Task {
+                                                await saveName(key: .currentItems)
+                                                name = ""
+                                            }
+                                        } label: {
+                                            Text("Add item to my list")
                                         }
-                                    } label: {
-                                        Text("Add item to my list")
                                     }
                                 }
+                        }
+                        .onTapGesture {
+                            if var index = items.firstIndex(where: { $0.id == item.id }) {
+                                items[index].isStrikethrough.toggle()
+                                if items[index].isStrikethrough {
+                                    items[index].imageName = "checkmark.square"
+                                } else {
+                                    items[index].imageName = "square"
+                                }
                             }
+                        }
                     }
                     .onMove(perform: move)
                 }
@@ -282,6 +292,9 @@ struct ListItemsView: View {
             if let index = array.firstIndex(of: oldName), let userId = getUserId() {
                 array[index] = self.name
                 await firebaseService.updateItem(userId: userId, items: array)
+                DispatchQueue.main.async {
+                    name = ""
+                }
             }
         }
     }
