@@ -227,7 +227,7 @@ class FirebaseService: ObservableObject {
         }
     }
     
-    func updateItems(userId: String, key: ListItemType, item: String) async {
+    func addItem(userId: String, key: ListItemType, item: String) async {
         
         let value = [
                     key.rawValue : FieldValue.arrayUnion([item])
@@ -235,7 +235,18 @@ class FirebaseService: ObservableObject {
         do {
             try await database.collection("users").document(userId).updateData(value)
         } catch {
-            debugPrint(String.boom, "updateItems: \(error)")
+            debugPrint(String.boom, "addItem: \(error)")
+        }
+    }
+    
+    func updateItem(userId: String, items: [String]) async {
+        let value = [
+                    "currentItems" : items,
+                    ]
+        do {
+            try await database.collection("users").document(userId).updateData(value)
+        } catch {
+            debugPrint(String.boom, "updateItem: \(error)")
         }
     }
     

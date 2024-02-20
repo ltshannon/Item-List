@@ -13,8 +13,10 @@ struct ListItemsView: View {
     @Environment(\.dismiss) var dismiss
     @State var showingAlert = false
     @State var showingAlert2 = false
+    @State var showingAlert3 = false
     @State var showingSheet = false
     @State var name = ""
+    @State var oldName = ""
     @State var items: [ItemData] = []
     @State var selectedUser: NameList = NameList(id: "n/a", name: "n/a")
     @State var showingAlert2Text = ""
@@ -49,6 +51,18 @@ struct ListItemsView: View {
                                         }
                                     } label: {
                                         Text("Delete")
+                                    }
+                                    .tint(.red)
+                                }
+                            }
+                            .swipeActions(edge: .trailing) {
+                                if key != .sharedItems {
+                                    Button {
+                                        oldName = item.name
+                                        name = item.name
+                                        showingAlert3 = true
+                                    } label: {
+                                        Text("Edit")
                                     }
                                 }
                             }
@@ -87,15 +101,13 @@ struct ListItemsView: View {
                         Text(title).font(key == .sharedItems ? .subheadline : .title)
                     }
                 }
-//                if key != .sharedItems {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            showingAlert = true
-                        } label: {
-                            Image(systemName: "plus")
-                        }
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showingAlert = true
+                    } label: {
+                        Image(systemName: "plus")
                     }
-//                }
+                }
                 if showShare == true {
                     ToolbarItem(placement: .confirmationAction) {
                         Button {
@@ -122,13 +134,28 @@ struct ListItemsView: View {
                         await saveName(key: key)
                     }
                 })
-                Button("Cancel", role: .cancel, action: {})
+                Button("Cancel", role: .cancel, action: {
+                    name = ""
+                })
             }, message: {
-                Text("Enter item name")
+                Text("")
             })
             .alert(showingAlert2Text, isPresented: $showingAlert2) {
                 Button("OK", role: .cancel) { }
             }
+            .alert("Edit item", isPresented: $showingAlert3, actions: {
+                TextField("Name", text: $name)
+                Button("Update", action: {
+                    Task {
+                        await updateName()
+                    }
+                })
+                Button("Cancel", role: .cancel, action: {
+                    name = ""
+                })
+            }, message: {
+                Text("")
+            })
             .fullScreenCover(isPresented: $showingSheet) {
                 ShareView()
             }
@@ -231,7 +258,7 @@ struct ListItemsView: View {
             return
         }
         if let user = getUserId() {
-            await firebaseService.updateItems(userId: user, key: key == .sharedItems ? .currentItems : key, item: name)
+            await firebaseService.addItem(userId: user, key: key == .sharedItems ? .currentItems : key, item: name)
             if key == .sharedItems {
                 let user = firebaseService.users.filter({ $0.id == userId }).first
                 if let fcm = user?.fcm,  let currentUser = userAuth.user, let displayName = currentUser.displayName {
@@ -242,6 +269,21 @@ struct ListItemsView: View {
             debugPrint(String.boom, "ListItemsView saveName could not get userId")
         }
         name = ""
+    }
+    
+    func updateName() async {
+        if name.isEmpty {
+            showingAlert2Text = "No item to update"
+            showingAlert2 = true
+            return
+        }
+        Task {
+            var array = items.map { $0.name }
+            if let index = array.firstIndex(of: oldName), let userId = getUserId() {
+                array[index] = self.name
+                await firebaseService.updateItem(userId: userId, items: array)
+            }
+        }
     }
     
     func move(from source: IndexSet, to destination: Int) {
