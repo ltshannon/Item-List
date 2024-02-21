@@ -35,6 +35,14 @@ struct DetailMoreListsView: View {
                         }
                 }
             }
+            Button {
+                showingAlert = true
+            } label: {
+                Image(systemName: "plus.circle")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+            }
         }
         .onAppear {
             for item in lists {
@@ -50,19 +58,25 @@ struct DetailMoreListsView: View {
                     Text("\(listName)").font(.headline)
                 }
             }
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showingAlert = true
-                } label: {
-                    Image(systemName: "plus")
-                }
-            }
+//            ToolbarItem(placement: .primaryAction) {
+//                Button {
+//                    showingAlert = true
+//                } label: {
+//                    Image(systemName: "plus")
+//                }
+//            }
         }
         .alert("Add item", isPresented: $showingAlert, actions: {
             TextField("Item", text: $name)
             Button("Save", action: {
                 Task {
                     await saveItem()
+                }
+            })
+            Button("Save and continue adding", action: {
+                Task {
+                    await saveItem()
+                    showingAlert = true
                 }
             })
             Button("Cancel", role: .cancel, action: {})

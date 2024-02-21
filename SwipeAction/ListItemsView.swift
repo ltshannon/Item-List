@@ -11,10 +11,14 @@ struct ListItemsView: View {
     @EnvironmentObject var firebaseService: FirebaseService
     @EnvironmentObject var userAuth: Authentication
     @Environment(\.dismiss) var dismiss
-    @State var showingAlert = false
-    @State var showingAlert2 = false
-    @State var showingAlert3 = false
-    @State var showingSheet = false
+    @State var showingAddItem = false
+    @State var showingAlertMessage = false
+    @State var showingEdit = false
+    @State var showingDeleteChecked = false
+    @State var showingDeleteAll = false
+    @State var showingCheckedAll = false
+    @State var showingUnchecked = false
+    @State var showingShareSheet = false
     @State var name = ""
     @State var oldName = ""
     @State var items: [ItemData] = []
@@ -60,7 +64,7 @@ struct ListItemsView: View {
                                     Button {
                                         oldName = item.name
                                         name = item.name
-                                        showingAlert3 = true
+                                        showingEdit = true
                                     } label: {
                                         Text("Edit")
                                     }
@@ -80,7 +84,7 @@ struct ListItemsView: View {
                                 }
                         }
                         .onTapGesture {
-                            if var index = items.firstIndex(where: { $0.id == item.id }) {
+                            if let index = items.firstIndex(where: { $0.id == item.id }) {
                                 items[index].isStrikethrough.toggle()
                                 if items[index].isStrikethrough {
                                     items[index].imageName = "checkmark.square"
@@ -93,15 +97,21 @@ struct ListItemsView: View {
                     .onMove(perform: move)
                 }
                 if showRestore == true {
-                    VStack {
-                        Button {
-                            restoreDefaults()
-                            dismiss()
-                        } label: {
-                            Text("Restore Defaults")
-                        }
-                        .buttonStyle(.bordered)
+                    Button {
+                        restoreDefaults()
+                        dismiss()
+                    } label: {
+                        Text("Restore Defaults")
                     }
+                    .buttonStyle(.bordered)
+                }
+                Button {
+                    showingAddItem = true
+                } label: {
+                    Image(systemName: "plus.circle")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -112,19 +122,49 @@ struct ListItemsView: View {
                     }
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showingAlert = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-                if showShare == true {
-                    ToolbarItem(placement: .confirmationAction) {
+                    Menu {
                         Button {
-                            showingSheet = true
+                            showingShareSheet = true
                         } label: {
-                            Image(systemName: "square.and.arrow.up")
+                            HStack {
+                                Text("Share List")
+                                Image(systemName: "square.and.arrow.up")
+                            }
                         }
+                        Button {
+                            showingDeleteChecked = true
+                        } label: {
+                            HStack {
+                                Text("Delete Checked")
+                                Image(systemName: "trash")
+                            }
+                        }
+                        Button {
+                            showingDeleteAll = true
+                        } label: {
+                            HStack {
+                                Text("Delete All")
+                                Image(systemName: "trash")
+                            }
+                        }
+                        Button {
+                            showingCheckedAll = true
+                        } label: {
+                            HStack {
+                                Text("Check All")
+                                Image(systemName: "checkmark.square")
+                            }
+                        }
+                        Button {
+                            showingUnchecked = true
+                        } label: {
+                            HStack {
+                                Text("Uncheck All")
+                                Image(systemName: "square")
+                            }
+                        }
+                    } label: {
+                        Label("Menu", systemImage: "ellipsis.circle")
                     }
                 }
                 if showDone == true {
@@ -137,11 +177,17 @@ struct ListItemsView: View {
                     }
                 }
             }
-            .alert("Add item", isPresented: $showingAlert, actions: {
+            .alert("Add item", isPresented: $showingAddItem, actions: {
                 TextField("Name", text: $name)
                 Button("Save", action: {
                     Task {
                         await saveName(key: key)
+                    }
+                })
+                Button("Save and continue adding", action: {
+                    Task {
+                        await saveName(key: key)
+                        showingAddItem = true
                     }
                 })
                 Button("Cancel", role: .cancel, action: {
@@ -150,10 +196,22 @@ struct ListItemsView: View {
             }, message: {
                 Text("")
             })
-            .alert(showingAlert2Text, isPresented: $showingAlert2) {
+            .alert(showingAlert2Text, isPresented: $showingAlertMessage) {
                 Button("OK", role: .cancel) { }
             }
-            .alert("Edit item", isPresented: $showingAlert3, actions: {
+            .alert("Delete All Checked?", isPresented: $showingDeleteChecked) {
+                Button("OK", role: .cancel) { deleteChecked() }
+            }
+            .alert("Delete all items?", isPresented: $showingDeleteAll) {
+                Button("OK", role: .cancel) { deleteAll() }
+            }
+            .alert("Check all items?", isPresented: $showingCheckedAll) {
+                Button("OK", role: .cancel) { checkAll() }
+            }
+            .alert("Uncheck all items?", isPresented: $showingUnchecked) {
+                Button("OK", role: .cancel) { uncheckAll() }
+            }
+            .alert("Edit item", isPresented: $showingEdit, actions: {
                 TextField("Name", text: $name)
                 Button("Update", action: {
                     Task {
@@ -166,7 +224,7 @@ struct ListItemsView: View {
             }, message: {
                 Text("")
             })
-            .fullScreenCover(isPresented: $showingSheet) {
+            .fullScreenCover(isPresented: $showingShareSheet) {
                 ShareView()
             }
             .onAppear {
@@ -178,15 +236,20 @@ struct ListItemsView: View {
                 }
             }
             .onReceive(firebaseService.$users) { items in
-                processUsers(users: items)
+                if let userId = getUserId() {
+                    let array = processUsers(userId: userId, listType: key, users: items)
+                    DispatchQueue.main.async {
+                        self.items = array
+                    }
+                }
             }
         }
     }
     
-    func processUsers(users: [UserInformation]) {
-        if let userId = getUserId(), let item = users.filter({ $0.id == userId }).first {
+    func processUsers(userId: String, listType: ListItemType, users: [UserInformation]) -> [ItemData] {
+        if let item = users.filter({ $0.id == userId }).first {
             var temp: [String]?
-            switch key {
+            switch listType {
             case .currentItems:
                 temp = item.currentItems
             case .defaultItems:
@@ -197,15 +260,14 @@ struct ListItemsView: View {
             if let currentItems = temp {
                 var array: [ItemData] = []
                 for item in currentItems {
-                    let new = ItemData(id: UUID().uuidString, name: item)
+                    let element = items.filter({ $0.name == item }).first
+                    let new = ItemData(id: UUID().uuidString, name: item, isStrikethrough: element?.isStrikethrough ?? false, imageName: element?.imageName ?? "square")
                     array.append(new)
                 }
-                DispatchQueue.main.async {
-                    self.items = array
-                }
-                return
+                return array
             }
         }
+        return []
     }
     
     func getUserId() -> String? {
@@ -220,10 +282,52 @@ struct ListItemsView: View {
         }
     }
     
+    func loadDefaults() {
+        
+    }
+    
     func restoreDefaults() {
         let data = items.map { $0.name }
         Task {
             await firebaseService.restoreDefault(items: data)
+        }
+    }
+    
+    func deleteChecked() {
+        let temp = items.filter { $0.isStrikethrough == false }
+        let array = temp.map { $0.name }
+        if let userId = getUserId() {
+            Task {
+                await firebaseService.updateItem(userId: userId, items: array)
+                DispatchQueue.main.async {
+                    name = ""
+                }
+            }
+        }
+    }
+    
+    func deleteAll() {
+        if let userId = getUserId() {
+            Task {
+                await firebaseService.updateItem(userId: userId, items: [])
+                DispatchQueue.main.async {
+                    name = ""
+                }
+            }
+        }
+    }
+    
+    func checkAll() {
+        for (index, _) in items.enumerated() {
+            items[index].imageName = "checkmark.square"
+            items[index].isStrikethrough = true
+        }
+    }
+    
+    func uncheckAll() {
+        for (index, _) in items.enumerated() {
+            items[index].imageName = "square"
+            items[index].isStrikethrough = false
         }
     }
     
@@ -250,7 +354,7 @@ struct ListItemsView: View {
     func saveName(key: ListItemType) async {
         if name.isEmpty {
             showingAlert2Text = "No item to add"
-            showingAlert2 = true
+            showingAlertMessage = true
             return
         }
         var temp: [ItemData] = []
@@ -263,7 +367,7 @@ struct ListItemsView: View {
         }
         if temp.contains(where: { $0.name == name }) {
             showingAlert2Text = "Name already in list"
-            showingAlert2 = true
+            showingAlertMessage = true
             name = ""
             return
         }
@@ -284,13 +388,13 @@ struct ListItemsView: View {
     func updateName() async {
         if name.isEmpty {
             showingAlert2Text = "No item to update"
-            showingAlert2 = true
+            showingAlertMessage = true
             return
         }
-        Task {
-            var array = items.map { $0.name }
-            if let index = array.firstIndex(of: oldName), let userId = getUserId() {
-                array[index] = self.name
+        var array = items.map { $0.name }
+        if let index = array.firstIndex(of: oldName), let userId = getUserId() {
+            array[index] = self.name
+            Task {
                 await firebaseService.updateItem(userId: userId, items: array)
                 DispatchQueue.main.async {
                     name = ""
