@@ -72,3 +72,10 @@ public extension String {
         !isEmpty
     }
 }
+
+extension UIColor {
+    static var accentColor: UIColor {
+        UIColor(named: "AccentColor") ?? .blue
+    }
+}
+

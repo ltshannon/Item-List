@@ -52,6 +52,7 @@
 		B1B512D12B759D8A005DCC21 /* SharedListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B512D02B759D8A005DCC21 /* SharedListView.swift */; };
 		B1B512D52B79C514005DCC21 /* MoreListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B512D42B79C514005DCC21 /* MoreListsView.swift */; };
 		B1D5FD022B8057A300FF90E4 /* DetailMoreListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D5FD012B8057A300FF90E4 /* DetailMoreListsView.swift */; };
+		B1D5FD042B86BF3600FF90E4 /* LoadMoreListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D5FD032B86BF3600FF90E4 /* LoadMoreListsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +81,7 @@
 		B1B512D02B759D8A005DCC21 /* SharedListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedListView.swift; sourceTree = "<group>"; };
 		B1B512D42B79C514005DCC21 /* MoreListsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreListsView.swift; sourceTree = "<group>"; };
 		B1D5FD012B8057A300FF90E4 /* DetailMoreListsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailMoreListsView.swift; sourceTree = "<group>"; };
+		B1D5FD032B86BF3600FF90E4 /* LoadMoreListsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadMoreListsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +150,7 @@
 				B1B512D02B759D8A005DCC21 /* SharedListView.swift */,
 				B1B512D42B79C514005DCC21 /* MoreListsView.swift */,
 				B1D5FD012B8057A300FF90E4 /* DetailMoreListsView.swift */,
+				B1D5FD032B86BF3600FF90E4 /* LoadMoreListsView.swift */,
 				B1B512CB2B73E0BA005DCC21 /* ProfileView.swift */,
 				B1B512A62B704C7D005DCC21 /* GoogleSignInBtn.swift */,
 				B1B512A12B6F46E4005DCC21 /* Utilities.swift */,
@@ -282,6 +285,7 @@
 				B1B512662B6DB402005DCC21 /* ListItemsView.swift in Sources */,
 				B1B512AB2B7193E5005DCC21 /* ButtonStyles.swift in Sources */,
 				B1B512992B6F44D4005DCC21 /* SignInView.swift in Sources */,
+				B1D5FD042B86BF3600FF90E4 /* LoadMoreListsView.swift in Sources */,
 				B1B512A92B718E8A005DCC21 /* ConnectionView.swift in Sources */,
 				B1B512A02B6F46A8005DCC21 /* GoogleSignInService.swift in Sources */,
 				B1B512CF2B73EC12005DCC21 /* StorageService.swift in Sources */,

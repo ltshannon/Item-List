@@ -58,7 +58,7 @@ class FirebaseService: ObservableObject {
     @Published var users: [UserInformation] = []
     @Published var sharingUsers: [UserInformation] = []
     @Published var moreLists: MoreLists = MoreLists()
-    private var moreListsListener: ListenerRegistration?
+    var moreListsListener: ListenerRegistration?
     var userListener: ListenerRegistration?
     
     func getUsers() {
@@ -239,12 +239,12 @@ class FirebaseService: ObservableObject {
         }
     }
     
-    func updateItem(userId: String, items: [String]) async {
+    func updateItem(userId: String, items: [String], listName: String, collectionName: String) async {
         let value = [
-                    "currentItems" : items,
+                    listName : items,
                     ]
         do {
-            try await database.collection("users").document(userId).updateData(value)
+            try await database.collection(collectionName).document(userId).updateData(value)
         } catch {
             debugPrint(String.boom, "updateItem: \(error)")
         }

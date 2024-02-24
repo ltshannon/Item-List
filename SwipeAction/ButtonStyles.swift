@@ -32,3 +32,31 @@ struct PlainTextButtonStyle: ButtonStyle {
             .padding(.trailing, 4.0) //This compensates for shadow width
     }
 }
+
+struct MoreListsButtonStyle: ButtonStyle {
+    @State var imageName: String
+    @Binding var loadList: String
+    var name: String
+    
+    func makeBody(configuration: Configuration) -> some View {
+        VStack {
+            HStack {
+                Image(systemName: imageName)
+                    .onTapGesture {
+                        if imageName == "circle" {
+                            imageName = "checkmark.circle"
+                            loadList = name
+                        } else {
+                            imageName = "circle"
+                        }
+                    }
+                configuration.label
+            }
+            .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+            .contentShape(Rectangle())
+            Divider()
+        }
+    }
+}
+
+

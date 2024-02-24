@@ -15,8 +15,10 @@ struct DetailMoreListsView: View {
     @State var listItems: [NameList] = []
     @State var showingAlert = false
     @State var showingAlert2 = false
+    @State var showingEdit = false
     @State var showingAlert2Text = ""
     @State var name = ""
+    @State var oldName = ""
     
     var body: some View {
         
@@ -31,6 +33,15 @@ struct DetailMoreListsView: View {
                                 }
                             } label: {
                                 Text("Delete")
+                            }
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button {
+                                oldName = item.name
+                                name = item.name
+                                showingEdit = true
+                            } label: {
+                                Text("Edit")
                             }
                         }
                 }
@@ -58,13 +69,6 @@ struct DetailMoreListsView: View {
                     Text("\(listName)").font(.headline)
                 }
             }
-//            ToolbarItem(placement: .primaryAction) {
-//                Button {
-//                    showingAlert = true
-//                } label: {
-//                    Image(systemName: "plus")
-//                }
-//            }
         }
         .alert("Add item", isPresented: $showingAlert, actions: {
             TextField("Item", text: $name)
@@ -85,6 +89,34 @@ struct DetailMoreListsView: View {
         })
         .alert(showingAlert2Text, isPresented: $showingAlert2) {
             Button("OK", role: .cancel) { }
+        }
+        .alert("Edit item", isPresented: $showingEdit) {
+            TextField("Name", text: $name)
+            Button("Update", action: {
+                Task {
+                    await updateName()
+                }
+            })
+            Button("Cancel", role: .cancel, action: {})
+        }
+    }
+        
+    func updateName() async {
+        if name.isEmpty {
+            showingAlert2Text = "No item to update"
+            showingAlert2  = true
+            return
+        }
+        var array = listItems.map { $0.name }
+        if let index = array.firstIndex(of: oldName), let user = userAuth.user {
+            array[index] = self.name
+            Task {
+                await firebaseService.updateItem(userId: user.uid, items: array, listName: listName, collectionName: "moreLists")
+                DispatchQueue.main.async {
+                    listItems[index].name = name
+                    name = ""
+                }
+            }
         }
     }
     

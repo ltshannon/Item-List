@@ -18,7 +18,10 @@ struct ListItemsView: View {
     @State var showingDeleteAll = false
     @State var showingCheckedAll = false
     @State var showingUnchecked = false
+    @State var showingDefaultList = false
+    @State var showingMoreLists = false
     @State var showingShareSheet = false
+    @State var showingShareSheetLoadMore = false
     @State var name = ""
     @State var oldName = ""
     @State var items: [ItemData] = []
@@ -87,24 +90,24 @@ struct ListItemsView: View {
                             if let index = items.firstIndex(where: { $0.id == item.id }) {
                                 items[index].isStrikethrough.toggle()
                                 if items[index].isStrikethrough {
-                                    items[index].imageName = "checkmark.square"
+                                    items[index].imageName = "checkmark.circle"
                                 } else {
-                                    items[index].imageName = "square"
+                                    items[index].imageName = "circle"
                                 }
                             }
                         }
                     }
                     .onMove(perform: move)
                 }
-                if showRestore == true {
-                    Button {
-                        restoreDefaults()
-                        dismiss()
-                    } label: {
-                        Text("Restore Defaults")
-                    }
-                    .buttonStyle(.bordered)
-                }
+//                if showRestore == true {
+//                    Button {
+//                        restoreDefaults()
+//                        dismiss()
+//                    } label: {
+//                        Text("Restore Defaults")
+//                    }
+//                    .buttonStyle(.bordered)
+//                }
                 Button {
                     showingAddItem = true
                 } label: {
@@ -121,50 +124,69 @@ struct ListItemsView: View {
                         Text(title).font(key == .sharedItems ? .subheadline : .title)
                     }
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Menu {
-                        Button {
-                            showingShareSheet = true
-                        } label: {
-                            HStack {
-                                Text("Share List")
-                                Image(systemName: "square.and.arrow.up")
+                if key == .currentItems {
+                    ToolbarItem(placement: .primaryAction) {
+                        Menu {
+                            Button {
+                                showingShareSheet = true
+                            } label: {
+                                HStack {
+                                    Text("Share List")
+                                    Image(systemName: "square.and.arrow.up")
+                                }
                             }
-                        }
-                        Button {
-                            showingDeleteChecked = true
-                        } label: {
-                            HStack {
-                                Text("Delete Checked")
-                                Image(systemName: "trash")
+                            Button {
+                                showingDeleteChecked = true
+                            } label: {
+                                HStack {
+                                    Text("Delete Checked")
+                                    Image(systemName: "trash")
+                                }
                             }
-                        }
-                        Button {
-                            showingDeleteAll = true
-                        } label: {
-                            HStack {
-                                Text("Delete All")
-                                Image(systemName: "trash")
+                            Button {
+                                showingDeleteAll = true
+                            } label: {
+                                HStack {
+                                    Text("Delete All")
+                                    Image(systemName: "trash")
+                                }
                             }
-                        }
-                        Button {
-                            showingCheckedAll = true
-                        } label: {
-                            HStack {
-                                Text("Check All")
-                                Image(systemName: "checkmark.square")
+                            Button {
+                                showingCheckedAll = true
+                            } label: {
+                                HStack {
+                                    Text("Check All")
+                                    Image(systemName: "checkmark.circle")
+                                }
                             }
-                        }
-                        Button {
-                            showingUnchecked = true
-                        } label: {
-                            HStack {
-                                Text("Uncheck All")
-                                Image(systemName: "square")
+                            Button {
+                                showingUnchecked = true
+                            } label: {
+                                HStack {
+                                    Text("Uncheck All")
+                                    Image(systemName: "circle")
+                                }
                             }
+                            Button {
+                                showingDefaultList = true
+                            } label: {
+                                HStack {
+                                    Text("Load Default List")
+                                    Image(systemName: "checklist")
+                                }
+                            }
+                            Button {
+                                showingShareSheetLoadMore = true
+                                //                            showingMoreLists = true
+                            } label: {
+                                HStack {
+                                    Text("Load a list from 'More Lists'")
+                                    Image(systemName: "checklist")
+                                }
+                            }
+                        } label: {
+                            Label("Menu", systemImage: "ellipsis.circle")
                         }
-                    } label: {
-                        Label("Menu", systemImage: "ellipsis.circle")
                     }
                 }
                 if showDone == true {
@@ -200,18 +222,36 @@ struct ListItemsView: View {
                 Button("OK", role: .cancel) { }
             }
             .alert("Delete All Checked?", isPresented: $showingDeleteChecked) {
-                Button("OK", role: .cancel) { deleteChecked() }
+                Button("Delete", role: .destructive, action: { deleteChecked() })
+                Button("Cancel", role: .cancel, action: {})
+            } message: {
+                Text("This will delete all checked items and changes you made.")
             }
             .alert("Delete all items?", isPresented: $showingDeleteAll) {
-                Button("OK", role: .cancel) { deleteAll() }
+                Button("Delete", role: .destructive, action: { deleteAll() })
+                Button("Cancel", role: .cancel, action: {})
+            } message: {
+                Text("This will delete all items and changes you made.")
             }
             .alert("Check all items?", isPresented: $showingCheckedAll) {
-                Button("OK", role: .cancel) { checkAll() }
+                Button("OK", action: { checkAll() })
+                Button("Cancel", role: .cancel, action: {})
             }
             .alert("Uncheck all items?", isPresented: $showingUnchecked) {
-                Button("OK", role: .cancel) { uncheckAll() }
+                Button("OK", action: { uncheckAll() })
+                Button("Cancel", role: .cancel, action: {})
             }
-            .alert("Edit item", isPresented: $showingEdit, actions: {
+            .alert("Load Default List?", isPresented: $showingDefaultList) {
+                Button("OK", action: { loadDefaults() })
+                Button("Cancel", role: .cancel, action: {})
+            } message: {
+                Text("This will replace what is in your 'My List'")
+            }
+            .alert("Load a list from the 'More Lists'?", isPresented: $showingMoreLists) {
+                Button("OK", action: { showingShareSheetLoadMore = true })
+                Button("Cancel", role: .cancel, action: {})
+            } message: {}
+            .alert("Edit item", isPresented: $showingEdit) {
                 TextField("Name", text: $name)
                 Button("Update", action: {
                     Task {
@@ -221,11 +261,14 @@ struct ListItemsView: View {
                 Button("Cancel", role: .cancel, action: {
                     name = ""
                 })
-            }, message: {
+            } message: {
                 Text("")
-            })
+            }
             .fullScreenCover(isPresented: $showingShareSheet) {
                 ShareView()
+            }
+            .fullScreenCover(isPresented: $showingShareSheetLoadMore) {
+                LoadMoreListsView()
             }
             .onAppear {
                 if firstTime {
@@ -261,7 +304,7 @@ struct ListItemsView: View {
                 var array: [ItemData] = []
                 for item in currentItems {
                     let element = items.filter({ $0.name == item }).first
-                    let new = ItemData(id: UUID().uuidString, name: item, isStrikethrough: element?.isStrikethrough ?? false, imageName: element?.imageName ?? "square")
+                    let new = ItemData(id: UUID().uuidString, name: item, isStrikethrough: element?.isStrikethrough ?? false, imageName: element?.imageName ?? "circle")
                     array.append(new)
                 }
                 return array
@@ -283,6 +326,13 @@ struct ListItemsView: View {
     }
     
     func loadDefaults() {
+        if let user = userAuth.user {
+            let itemData = processUsers(userId: user.uid, listType: .defaultItems, users: firebaseService.users)
+            let array = itemData.map { $0.name }
+            Task {
+                await firebaseService.updateItem(userId: user.uid, items: array, listName: "currentItems", collectionName: "users")
+            }
+        }
         
     }
     
@@ -298,7 +348,7 @@ struct ListItemsView: View {
         let array = temp.map { $0.name }
         if let userId = getUserId() {
             Task {
-                await firebaseService.updateItem(userId: userId, items: array)
+                await firebaseService.updateItem(userId: userId, items: array, listName: "currentItems", collectionName: "users")
                 DispatchQueue.main.async {
                     name = ""
                 }
@@ -309,7 +359,7 @@ struct ListItemsView: View {
     func deleteAll() {
         if let userId = getUserId() {
             Task {
-                await firebaseService.updateItem(userId: userId, items: [])
+                await firebaseService.updateItem(userId: userId, items: [], listName: "currentItems", collectionName: "users")
                 DispatchQueue.main.async {
                     name = ""
                 }
@@ -319,14 +369,14 @@ struct ListItemsView: View {
     
     func checkAll() {
         for (index, _) in items.enumerated() {
-            items[index].imageName = "checkmark.square"
+            items[index].imageName = "checkmark.circle"
             items[index].isStrikethrough = true
         }
     }
     
     func uncheckAll() {
         for (index, _) in items.enumerated() {
-            items[index].imageName = "square"
+            items[index].imageName = "circle"
             items[index].isStrikethrough = false
         }
     }
@@ -395,7 +445,7 @@ struct ListItemsView: View {
         if let index = array.firstIndex(of: oldName), let userId = getUserId() {
             array[index] = self.name
             Task {
-                await firebaseService.updateItem(userId: userId, items: array)
+                await firebaseService.updateItem(userId: userId, items: array, listName: key.rawValue, collectionName: "users")
                 DispatchQueue.main.async {
                     name = ""
                 }
