@@ -130,7 +130,7 @@ struct MoreListsView: View {
             }
             
             Task {
-                await firebaseService.updateItem(userId: user.uid, items: array, listName: "lists", collectionName: "moreLists")
+                await firebaseService.updateItem(userId: user.uid, items: array, listName: "xxxLists", collectionName: "moreLists")
                 let result = await firebaseService.deleteFieldFromMoreItems(docID: user.uid, listName: oldName)
                 if result == true {
                     await firebaseService.updateItem(userId: user.uid, items: oldList, listName: name, collectionName: "moreLists")
@@ -158,7 +158,7 @@ struct MoreListsView: View {
         }
         
         if let user = userAuth.user {
-            await firebaseService.updateItemsForMoreItems(userId: user.uid, listName: "lists", item: name)
+            await firebaseService.updateItemsForMoreItems(userId: user.uid, listName: "xxxLists", item: name)
         } else {
             debugPrint(String.boom, "MoreListsViewsaveName could not get userId")
         }
@@ -169,7 +169,7 @@ struct MoreListsView: View {
         if let user = userAuth.user {
             let result = await firebaseService.deleteFieldFromMoreItems(docID: user.uid, listName: item)
             if result {
-                await firebaseService.deleteMoreItem(userId: user.uid, listName: "lists", item: item)
+                await firebaseService.deleteMoreItem(userId: user.uid, listName: "xxxLists", item: item)
             }
         }
     }

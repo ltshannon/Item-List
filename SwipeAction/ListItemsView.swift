@@ -18,12 +18,14 @@ struct ListItemsView: View {
     @State var showingDeleteAll = false
     @State var showingCheckedAll = false
     @State var showingUnchecked = false
+    @State var showingSaveList = false
     @State var showingDefaultList = false
     @State var showingMoreLists = false
     @State var showingShareSheet = false
     @State var showingShareSheetLoadMore = false
     @State var name = ""
     @State var oldName = ""
+    @State var savedListName = ""
     @State var items: [ItemData] = []
     @State var selectedUser: NameList = NameList(id: "n/a", name: "n/a")
     @State var showingAlert2Text = ""
@@ -99,15 +101,6 @@ struct ListItemsView: View {
                     }
                     .onMove(perform: move)
                 }
-//                if showRestore == true {
-//                    Button {
-//                        restoreDefaults()
-//                        dismiss()
-//                    } label: {
-//                        Text("Restore Defaults")
-//                    }
-//                    .buttonStyle(.bordered)
-//                }
                 Button {
                     showingAddItem = true
                 } label: {
@@ -165,6 +158,14 @@ struct ListItemsView: View {
                                 HStack {
                                     Text("Uncheck All")
                                     Image(systemName: "circle")
+                                }
+                            }
+                            Button {
+                                showingSaveList = true
+                            } label: {
+                                HStack {
+                                    Text("Save Current List")
+                                    Image(systemName: "checklist")
                                 }
                             }
                             Button {
@@ -241,16 +242,25 @@ struct ListItemsView: View {
                 Button("OK", action: { uncheckAll() })
                 Button("Cancel", role: .cancel, action: {})
             }
+            .alert("Save the current List?", isPresented: $showingSaveList) {
+                TextField("Create a name for the list", text: $savedListName)
+                Button("OK", action: { saveCurrentList() })
+                Button("Cancel", role: .cancel, action: {})
+            } message: {
+                Text("This will save your current 'My List'")
+            }
             .alert("Load Default List?", isPresented: $showingDefaultList) {
                 Button("OK", action: { loadDefaults() })
                 Button("Cancel", role: .cancel, action: {})
             } message: {
-                Text("This will replace what is in your 'My List'")
+                Text("This will replace what's in your 'My List'. Be sure to save your current list first! Because this will delete it.")
             }
-            .alert("Load a list from the 'More Lists'?", isPresented: $showingMoreLists) {
+            .alert("Load from the 'More Lists'?", isPresented: $showingMoreLists) {
                 Button("OK", action: { showingShareSheetLoadMore = true })
                 Button("Cancel", role: .cancel, action: {})
-            } message: {}
+            } message: {
+                Text("Select a list from 'More Lists' to view")
+            }
             .alert("Edit item", isPresented: $showingEdit) {
                 TextField("Name", text: $name)
                 Button("Update", action: {
@@ -399,6 +409,19 @@ struct ListItemsView: View {
             return array
         }
         return nil
+    }
+    
+    func saveCurrentList() {
+        if let user = getUserId() {
+            Task {
+                do {
+                    let savedLists = try await firebaseService.getSavedListsForUser(userId: user)
+                    debugPrint(String.boom, "\(savedLists)")
+                } catch {
+                    debugPrint("🧨", "saveCurrentList error: \(error.localizedDescription)")
+                }
+            }
+        }
     }
     
     func saveName(key: ListItemType) async {

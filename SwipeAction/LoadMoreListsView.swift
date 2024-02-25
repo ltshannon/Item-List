@@ -48,7 +48,7 @@ struct LoadMoreListsView: View {
                 Button("OK", action: { loadTheList() })
                 Button("Cancel", role: .cancel, action: {})
             } message: {
-                Text("This will replace what is in your 'My List'")
+                Text("This will delete what's in your 'My List'. Be sure to save your current list before loading this list.")
             }
             .onAppear {
                 if let userId = userAuth.user?.uid, firebaseService.moreListsListener == nil {

@@ -3,4 +3,210 @@
    uuid = "826039AE-2E89-4633-AB2C-1B1531926FCA"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "AC9D0925-573F-4635-BCA2-5F1EA994E530"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SwipeAction/ListItemsView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "421"
+            endingLineNumber = "421"
+            landmarkName = "saveCurrentList()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "AC9D0925-573F-4635-BCA2-5F1EA994E530 - 36c029d81497a433"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for closure #1 @Sendable () async -&gt; () in SwipeAction.ListItemsView.saveCurrentList() -&gt; ()"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/ListItemsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "423"
+                  endingLineNumber = "423"
+                  offsetFromSymbolStart = "564">
+               </Location>
+               <Location
+                  uuid = "AC9D0925-573F-4635-BCA2-5F1EA994E530 - 6e792db4eaa96031"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for closure #1 @Sendable () async -&gt; () in SwipeAction.ListItemsView.saveCurrentList() -&gt; ()"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/ListItemsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "423"
+                  endingLineNumber = "423"
+                  offsetFromSymbolStart = "140">
+               </Location>
+               <Location
+                  uuid = "AC9D0925-573F-4635-BCA2-5F1EA994E530 - 6e792db4eaa96073"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for closure #1 @Sendable () async -&gt; () in SwipeAction.ListItemsView.saveCurrentList() -&gt; ()"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/ListItemsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "421"
+                  endingLineNumber = "421"
+                  offsetFromSymbolStart = "212">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "58C6420D-89BA-4E63-9AAC-B10AB35F218D"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SwipeAction/Services/FirebaseService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "110"
+            endingLineNumber = "110"
+            landmarkName = "getSavedListsForUser(userId:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "58C6420D-89BA-4E63-9AAC-B10AB35F218D - 412002276bbaaf1c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SwipeAction.FirebaseService.getMoreLists(docID: Swift.String) -&gt; ()"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/Services/FirebaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "504">
+               </Location>
+               <Location
+                  uuid = "58C6420D-89BA-4E63-9AAC-B10AB35F218D - 84cdab761c2f1749"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for SwipeAction.FirebaseService.getSavedListsForUser(userId: Swift.String) async throws -&gt; Swift.Optional&lt;SwipeAction.MoreLists&gt;"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/Services/FirebaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "128">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7BA683DF-6A81-4DF3-A7EA-3B9B76C2D41E"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SwipeAction/Services/FirebaseService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "getSavedListsForUser(userId:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "7BA683DF-6A81-4DF3-A7EA-3B9B76C2D41E - c4e2d09a3e46429c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for SwipeAction.FirebaseService.getSavedListsForUser(userId: Swift.String) async throws -&gt; Swift.Optional&lt;SwipeAction.SavedLists&gt;"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/Services/FirebaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "114"
+                  endingLineNumber = "114"
+                  offsetFromSymbolStart = "88">
+               </Location>
+               <Location
+                  uuid = "7BA683DF-6A81-4DF3-A7EA-3B9B76C2D41E - 3802a26611b77923"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for SwipeAction.FirebaseService.getSavedListsForUser(userId: Swift.String) async throws -&gt; Swift.Optional&lt;SwipeAction.SavedLists&gt;"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/Services/FirebaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "114"
+                  endingLineNumber = "114"
+                  offsetFromSymbolStart = "52">
+               </Location>
+               <Location
+                  uuid = "7BA683DF-6A81-4DF3-A7EA-3B9B76C2D41E - 367b532ca140bede"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for SwipeAction.FirebaseService.getSavedListsForUser(userId: Swift.String) async throws -&gt; Swift.Optional&lt;SwipeAction.SavedLists&gt;"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/Services/FirebaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "114"
+                  endingLineNumber = "114"
+                  offsetFromSymbolStart = "76">
+               </Location>
+               <Location
+                  uuid = "7BA683DF-6A81-4DF3-A7EA-3B9B76C2D41E - 910f136410c198f9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for SwipeAction.FirebaseService.getSavedListsForUser(userId: Swift.String) async throws -&gt; Swift.Optional&lt;SwipeAction.SavedLists&gt;"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/Services/FirebaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "114"
+                  endingLineNumber = "114"
+                  offsetFromSymbolStart = "40">
+               </Location>
+               <Location
+                  uuid = "7BA683DF-6A81-4DF3-A7EA-3B9B76C2D41E - 84cdab761c2f16cd"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for SwipeAction.FirebaseService.getSavedListsForUser(userId: Swift.String) async throws -&gt; Swift.Optional&lt;SwipeAction.MoreLists&gt;"
+                  moduleName = "SwipeAction"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/larryshannon/Desktop/SwipeAction/SwipeAction/Services/FirebaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "114"
+                  endingLineNumber = "114"
+                  offsetFromSymbolStart = "632">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

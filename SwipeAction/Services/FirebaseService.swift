@@ -31,7 +31,7 @@ struct MoreLists: Codable, Identifiable, Hashable {
 
 extension MoreLists {
     init(snapshot: Dictionary<String, Any>) {
-        let items = snapshot["lists"] as? [String] ?? []
+        let items = snapshot["xxxLists"] as? [String] ?? []
         var nameLists: [NameList] = []
         let _ = items.map {
             let nameItem = NameList(id: UUID().uuidString, name: $0)
@@ -102,6 +102,17 @@ class FirebaseService: ObservableObject {
             }
         }
             moreListsListener = moreLists
+    }
+    
+    func getSavedListsForUser(userId: String) async throws -> MoreLists? {
+        
+        let document = try await database.collection("savedLists").document(userId).getDocument()
+        if document.exists {
+            let lists = MoreLists(snapshot: document.data() ?? [:])
+            return lists
+        }
+        return nil
+
     }
     
     func getSharedUsers() async {
