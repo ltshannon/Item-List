@@ -20,11 +20,11 @@ struct ContentView: View {
                     Label("My List", systemImage: "list.dash")
                 }
                 .tag(1)
-            MoreListsView()
-                .tabItem {
-                    Label("More Lists", systemImage: "list.dash")
-                }
-                .tag(2)
+//            MoreListsView(collectionName: "moreLists", fromTabBar: true)
+//                .tabItem {
+//                    Label("More Lists", systemImage: "list.dash")
+//                }
+//                .tag(2)
             SharedListView()
                 .tabItem {
                     Label("Shared Lists", systemImage: "list.dash")

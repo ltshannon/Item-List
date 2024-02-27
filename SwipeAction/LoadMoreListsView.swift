@@ -11,20 +11,22 @@ struct LoadMoreListsView: View {
     @EnvironmentObject var firebaseService: FirebaseService
     @EnvironmentObject var userAuth: Authentication
     @Environment(\.dismiss) var dismiss
-    @State var moreLists: [NameList] = []
+    var collectionName: String
+    @State var nameLists: [NameList] = []
     @State var loadList = ""
     @State var showingLoadList = false
+    @State var moreLists: MoreLists?
     
     var body: some View {
         NavigationStack {
             VStack {
                 ScrollView {
-                    ForEach(firebaseService.moreLists.listNames, id: \.id) { item in
+                    ForEach(nameLists, id: \.id) { item in
                         NavigationLink(item.name, value: item.name)
                             .buttonStyle(MoreListsButtonStyle(imageName: item.imageName, loadList: $loadList, name: item.name))
                     }
                     .navigationDestination(for: String.self) { string in
-                        DetailMoreListsView(listName: string, lists: firebaseService.moreLists.lists)
+                        DetailMoreListsView(collectionName: collectionName, listName: string, lists: moreLists?.lists ?? [[:]])
                     }
                 }
             }
@@ -51,8 +53,17 @@ struct LoadMoreListsView: View {
                 Text("This will delete what's in your 'My List'. Be sure to save your current list before loading this list.")
             }
             .onAppear {
-                if let userId = userAuth.user?.uid, firebaseService.moreListsListener == nil {
-                    firebaseService.getMoreLists(docID: userId)
+                if let userId = userAuth.user?.uid {
+                    Task {
+                        do {
+                            if let results = try await firebaseService.getListsForUser(userId: userId, collectionName: collectionName) {
+                                DispatchQueue.main.async {
+                                    self.moreLists = results
+                                    self.nameLists = results.listNames
+                                }
+                            }
+                        }
+                    }
                 }
             }
             .onChange(of: loadList) {
@@ -62,24 +73,20 @@ struct LoadMoreListsView: View {
     }
     
     func loadTheList() {
-        debugPrint(String.boom, "\(loadList)")
-        let temp = firebaseService.moreLists.lists
-        var array: [String] = []
-        for dict in temp {
-            if let nameList = dict[loadList] {
-                array = nameList.map { $0.name }
-                break
+        if let lists = moreLists?.lists {
+            var array: [String] = []
+            for dict in lists {
+                if let nameList = dict[loadList] {
+                    array = nameList.map { $0.name }
+                    break
+                }
             }
-        }
-        Task {
-            if let userId = userAuth.user?.uid {
-                await firebaseService.updateItem(userId: userId, items: array, listName: "currentItems", collectionName: "users")
+            Task {
+                if let userId = userAuth.user?.uid {
+                    await firebaseService.updateItem(userId: userId, items: array, listName: "currentItems", collectionName: "users")
+                }
             }
+            dismiss()
         }
-        dismiss()
     }
-}
-
-#Preview {
-    LoadMoreListsView()
 }

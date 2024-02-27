@@ -18,11 +18,13 @@ struct ListItemsView: View {
     @State var showingDeleteAll = false
     @State var showingCheckedAll = false
     @State var showingUnchecked = false
-    @State var showingSaveList = false
-    @State var showingDefaultList = false
+    @State var showingSavedLists = false
     @State var showingMoreLists = false
+    @State var showingSavedList = false
+    @State var showingDefaultList = false
     @State var showingShareSheet = false
     @State var showingShareSheetLoadMore = false
+    @State var showDefaultSheet = false
     @State var name = ""
     @State var oldName = ""
     @State var savedListName = ""
@@ -128,61 +130,86 @@ struct ListItemsView: View {
                                     Image(systemName: "square.and.arrow.up")
                                 }
                             }
-                            Button {
-                                showingDeleteChecked = true
-                            } label: {
-                                HStack {
-                                    Text("Delete Checked")
-                                    Image(systemName: "trash")
+                            Menu {
+                                Button {
+                                    showingCheckedAll = true
+                                } label: {
+                                    HStack {
+                                        Text("Check All")
+                                        Image(systemName: "checkmark.circle")
+                                    }
                                 }
-                            }
-                            Button {
-                                showingDeleteAll = true
-                            } label: {
-                                HStack {
-                                    Text("Delete All")
-                                    Image(systemName: "trash")
+                                Button {
+                                    showingUnchecked = true
+                                } label: {
+                                    HStack {
+                                        Text("Uncheck All")
+                                        Image(systemName: "circle")
+                                    }
                                 }
-                            }
-                            Button {
-                                showingCheckedAll = true
-                            } label: {
-                                HStack {
-                                    Text("Check All")
-                                    Image(systemName: "checkmark.circle")
+                                Button {
+                                    showingDeleteChecked = true
+                                } label: {
+                                    HStack {
+                                        Text("Delete Checked")
+                                        Image(systemName: "trash")
+                                    }
                                 }
-                            }
-                            Button {
-                                showingUnchecked = true
-                            } label: {
-                                HStack {
-                                    Text("Uncheck All")
-                                    Image(systemName: "circle")
+                                Button {
+                                    showingDeleteAll = true
+                                } label: {
+                                    HStack {
+                                        Text("Delete All")
+                                        Image(systemName: "trash")
+                                    }
                                 }
-                            }
-                            Button {
-                                showingSaveList = true
-                            } label: {
-                                HStack {
-                                    Text("Save Current List")
-                                    Image(systemName: "checklist")
+                                Button {
+                                    showingSavedList = true
+                                } label: {
+                                    HStack {
+                                        Text("Save 'Your Items List'")
+                                        Image(systemName: "checklist")
+                                    }
                                 }
-                            }
-                            Button {
-                                showingDefaultList = true
                             } label: {
-                                HStack {
-                                    Text("Load Default List")
-                                    Image(systemName: "checklist")
+                                Label("Your Items List", systemImage: "folder.circle")
+                            }
+                            Menu {
+                                Button {
+                                    showingDefaultList = true
+                                } label: {
+                                    HStack {
+                                        Text("Load Default List")
+                                        Image(systemName: "checklist")
+                                    }
                                 }
-                            }
-                            Button {
-                                showingShareSheetLoadMore = true
-                                //                            showingMoreLists = true
+                                Button {
+                                    showDefaultSheet = true
+                                } label: {
+                                    HStack {
+                                        Text("Edit Default List")
+                                        Image(systemName: "checklist")
+                                    }
+                                }
                             } label: {
-                                HStack {
-                                    Text("Load a list from 'More Lists'")
-                                    Image(systemName: "checklist")
+                                Label("Default List", systemImage: "folder.circle")
+                            }
+                            Group {
+                                Button {
+                                    showingSavedLists = true
+                                } label: {
+                                    HStack {
+                                        Text("Saved Lists")
+                                        Image(systemName: "checklist")
+                                    }
+                                }
+                                Button {
+                                    showingMoreLists = true
+                                } label: {
+                                    HStack {
+                                        Text("Other Lists")
+                                        Image(systemName: "checklist")
+                                    }
                                 }
                             }
                         } label: {
@@ -242,24 +269,18 @@ struct ListItemsView: View {
                 Button("OK", action: { uncheckAll() })
                 Button("Cancel", role: .cancel, action: {})
             }
-            .alert("Save the current List?", isPresented: $showingSaveList) {
+            .alert("Save 'Your Items List'", isPresented: $showingSavedList) {
                 TextField("Create a name for the list", text: $savedListName)
                 Button("OK", action: { saveCurrentList() })
                 Button("Cancel", role: .cancel, action: {})
             } message: {
-                Text("This will save your current 'My List'")
+                Text("This will save your 'Your Items List'")
             }
             .alert("Load Default List?", isPresented: $showingDefaultList) {
                 Button("OK", action: { loadDefaults() })
                 Button("Cancel", role: .cancel, action: {})
             } message: {
                 Text("This will replace what's in your 'My List'. Be sure to save your current list first! Because this will delete it.")
-            }
-            .alert("Load from the 'More Lists'?", isPresented: $showingMoreLists) {
-                Button("OK", action: { showingShareSheetLoadMore = true })
-                Button("Cancel", role: .cancel, action: {})
-            } message: {
-                Text("Select a list from 'More Lists' to view")
             }
             .alert("Edit item", isPresented: $showingEdit) {
                 TextField("Name", text: $name)
@@ -277,8 +298,14 @@ struct ListItemsView: View {
             .fullScreenCover(isPresented: $showingShareSheet) {
                 ShareView()
             }
-            .fullScreenCover(isPresented: $showingShareSheetLoadMore) {
-                LoadMoreListsView()
+            .fullScreenCover(isPresented: $showingSavedLists) {
+                MoreListsView(collectionName: "savedLists", title: "Saved Lists")
+            }
+            .fullScreenCover(isPresented: $showingMoreLists) {
+                MoreListsView(collectionName: "moreLists", title: "Other Lists")
+            }
+            .fullScreenCover(isPresented: $showDefaultSheet) {
+                ListItemsView(key: ListItemType.defaultItems, title: "Default Items", showShare: false, showDone: true, showRestore: true)
             }
             .onAppear {
                 if firstTime {
@@ -346,12 +373,12 @@ struct ListItemsView: View {
         
     }
     
-    func restoreDefaults() {
-        let data = items.map { $0.name }
-        Task {
-            await firebaseService.restoreDefault(items: data)
-        }
-    }
+//    func restoreDefaults() {
+//        let data = items.map { $0.name }
+//        Task {
+//            await firebaseService.restoreDefault(items: data)
+//        }
+//    }
     
     func deleteChecked() {
         let temp = items.filter { $0.isStrikethrough == false }
@@ -415,8 +442,21 @@ struct ListItemsView: View {
         if let user = getUserId() {
             Task {
                 do {
-                    let savedLists = try await firebaseService.getSavedListsForUser(userId: user)
-                    debugPrint(String.boom, "\(savedLists)")
+                    if let savedLists = try await firebaseService.getListsForUser(userId: user, collectionName: "savedLists") {
+                        let listNames = savedLists.listNames
+                        if listNames.contains(where: { $0.name == savedListName }) {
+                            DispatchQueue.main.async {
+                                savedListName = ""
+                                showingAlert2Text = "List name already in use"
+                                showingAlertMessage = true
+                            }
+                        }
+                        var names = listNames.map { $0.name }
+                        names.append(savedListName)
+                        await firebaseService.updateItem(userId: user, items: names, listName: "xxxLists", collectionName: "savedLists")
+                        names = items.map { $0.name }
+                        await firebaseService.updateItem(userId: user, items: names, listName: savedListName, collectionName: "savedLists")
+                    }
                 } catch {
                     debugPrint("🧨", "saveCurrentList error: \(error.localizedDescription)")
                 }

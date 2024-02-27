@@ -10,6 +10,8 @@ import SwiftUI
 struct DetailMoreListsView: View {
     @EnvironmentObject var firebaseService: FirebaseService
     @EnvironmentObject var userAuth: Authentication
+    @Environment(\.dismiss) var dismiss
+    var collectionName: String
     var listName: String
     var lists: [[String: [NameList]]]
     @State var listItems: [NameList] = []
@@ -69,6 +71,13 @@ struct DetailMoreListsView: View {
                     Text("\(listName)").font(.headline)
                 }
             }
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    restoreList()
+                } label: {
+                    Text("Restore List")
+                }
+            }
         }
         .alert("Add item", isPresented: $showingAlert, actions: {
             TextField("Item", text: $name)
@@ -100,6 +109,18 @@ struct DetailMoreListsView: View {
             Button("Cancel", role: .cancel, action: {})
         }
     }
+    
+    func restoreList() {
+        if let user = userAuth.user {
+            let array = listItems.map { $0.name }
+            Task {
+                await firebaseService.updateItem(userId: user.uid, items: array, listName: "currentItems", collectionName: "users")
+                DispatchQueue.main.async {
+                    dismiss()
+                }
+            }
+        }
+    }
         
     func updateName() async {
         if name.isEmpty {
@@ -111,7 +132,7 @@ struct DetailMoreListsView: View {
         if let index = array.firstIndex(of: oldName), let user = userAuth.user {
             array[index] = self.name
             Task {
-                await firebaseService.updateItem(userId: user.uid, items: array, listName: listName, collectionName: "moreLists")
+                await firebaseService.updateItem(userId: user.uid, items: array, listName: listName, collectionName: collectionName)
                 DispatchQueue.main.async {
                     listItems[index].name = name
                     name = ""
@@ -135,7 +156,7 @@ struct DetailMoreListsView: View {
         }
         
         if let user = userAuth.user {
-            await firebaseService.updateItemsForMoreItems(userId: user.uid, listName: listName, item: name)
+            await firebaseService.updateItemsForMoreItems(userId: user.uid, listName: listName, item: name, collectionName: collectionName)
             let item = NameList(id: UUID().uuidString, name: name)
             listItems.append(item)
             name = ""
@@ -146,7 +167,7 @@ struct DetailMoreListsView: View {
     
     func deleteItem(item: String) async {
         if let user = userAuth.user {
-            await firebaseService.deleteMoreItem(userId: user.uid, listName: listName, item: item)
+            await firebaseService.deleteMoreItem(userId: user.uid, listName: listName, item: item, collectionName: collectionName)
             listItems.removeAll(where: { $0.name == item } )
         }
     }

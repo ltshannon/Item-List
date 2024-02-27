@@ -22,7 +22,10 @@ struct MoreListsView: View {
     @EnvironmentObject var firebaseService: FirebaseService
     @EnvironmentObject var userAuth: Authentication
     @Environment(\.dismiss) var dismiss
-    @State var moreLists: [NameList] = []
+    var collectionName: String
+    var title: String
+    @State var moreLists: MoreLists?
+    @State var nameLists: [NameList] = []
     @State var name = ""
     @State var oldName = ""
     @State var showingAlertSave = false
@@ -35,7 +38,7 @@ struct MoreListsView: View {
         NavigationStack {
             VStack {
                 List {
-                    ForEach(firebaseService.moreLists.listNames, id: \.id) { item in
+                    ForEach(nameLists, id: \.id) { item in
                         NavigationLink(item.name, value: item.name)
                             .swipeActions(edge: .trailing) {
                                 Button {
@@ -58,7 +61,7 @@ struct MoreListsView: View {
                     }
                 }
                 .navigationDestination(for: String.self) { string in
-                    DetailMoreListsView(listName: string, lists: firebaseService.moreLists.lists)
+                    DetailMoreListsView(collectionName: collectionName, listName: string, lists: moreLists?.lists ?? [[:]])
                 }
                 Button {
                     showingAlertSave = true
@@ -73,7 +76,14 @@ struct MoreListsView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack {
-                        Text("Your other lists:").font(.title)
+                        Text(title).font(.title)
+                    }
+                }
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("Cancel")
                     }
                 }
             }
@@ -101,8 +111,15 @@ struct MoreListsView: View {
                 Button("OK", role: .cancel) { }
             }
             .onAppear {
-                if firstTime, let userId = userAuth.user?.uid {
-                    firebaseService.getMoreLists(docID: userId)
+                if firstTime == true, let userId = userAuth.user?.uid {
+                    firebaseService.getMoreLists(docID: userId, collectionName: collectionName)
+                    firstTime = false
+                }
+            }
+            .onChange(of: firebaseService.moreLists) { oldValue, newValue in
+                DispatchQueue.main.async {
+                    self.moreLists = newValue
+                    self.nameLists = newValue.listNames
                 }
             }
         }
@@ -118,26 +135,27 @@ struct MoreListsView: View {
             showingAlertMessage  = true
             return
         }
-        var array = firebaseService.moreLists.listNames.map { $0.name }
-        if let index = array.firstIndex(of: oldName), let user = userAuth.user {
-            array[index] = self.name
-            let temp = firebaseService.moreLists.lists
-            var oldList: [String] = []
-            for a in temp {
-                if let nameList = a[oldName] {
-                    oldList = nameList.map { $0.name }
+        if let moreLists = moreLists {
+            var array = moreLists.listNames.map { $0.name }
+            if let index = array.firstIndex(of: oldName), let user = userAuth.user {
+                array[index] = self.name
+                var oldList: [String] = []
+                for a in moreLists.lists {
+                    if let nameList = a[oldName] {
+                        oldList = nameList.map { $0.name }
+                    }
                 }
-            }
-            
-            Task {
-                await firebaseService.updateItem(userId: user.uid, items: array, listName: "xxxLists", collectionName: "moreLists")
-                let result = await firebaseService.deleteFieldFromMoreItems(docID: user.uid, listName: oldName)
-                if result == true {
-                    await firebaseService.updateItem(userId: user.uid, items: oldList, listName: name, collectionName: "moreLists")
-                    await deleteItem(item: oldName)
-                }
-                DispatchQueue.main.async {
-                    name = ""
+                
+                Task {
+                    await firebaseService.updateItem(userId: user.uid, items: array, listName: "xxxLists", collectionName: collectionName)
+                    let result = await firebaseService.deleteFieldFromMoreItems(docID: user.uid, listName: oldName, collectionName: collectionName)
+                    if result == true {
+                        await firebaseService.updateItem(userId: user.uid, items: oldList, listName: name, collectionName: collectionName)
+                        await deleteItem(item: oldName)
+                    }
+                    DispatchQueue.main.async {
+                        name = ""
+                    }
                 }
             }
         }
@@ -150,7 +168,7 @@ struct MoreListsView: View {
             return
         }
 
-        if firebaseService.moreLists.listNames.contains(where: { $0.name == name }) {
+        if let moreLists = moreLists, moreLists.listNames.contains(where: { $0.name == name }) {
             showingAlertMessageText = "Name already in list"
             showingAlertMessage = true
             name = ""
@@ -158,7 +176,7 @@ struct MoreListsView: View {
         }
         
         if let user = userAuth.user {
-            await firebaseService.updateItemsForMoreItems(userId: user.uid, listName: "xxxLists", item: name)
+            await firebaseService.updateItemsForMoreItems(userId: user.uid, listName: "xxxLists", item: name, collectionName: collectionName)
         } else {
             debugPrint(String.boom, "MoreListsViewsaveName could not get userId")
         }
@@ -167,9 +185,9 @@ struct MoreListsView: View {
     
     func deleteItem(item: String) async {
         if let user = userAuth.user {
-            let result = await firebaseService.deleteFieldFromMoreItems(docID: user.uid, listName: item)
+            let result = await firebaseService.deleteFieldFromMoreItems(docID: user.uid, listName: item, collectionName: collectionName)
             if result {
-                await firebaseService.deleteMoreItem(userId: user.uid, listName: "xxxLists", item: item)
+                await firebaseService.deleteMoreItem(userId: user.uid, listName: "xxxLists", item: item, collectionName: collectionName)
             }
         }
     }

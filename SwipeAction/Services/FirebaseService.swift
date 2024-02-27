@@ -88,9 +88,10 @@ class FirebaseService: ObservableObject {
         userListener = listener
     }
     
-    func getMoreLists(docID: String) {
+    func getMoreLists(docID: String, collectionName: String) {
         
-        let moreLists = database.collection("moreLists").document(docID).addSnapshotListener { documentSnapshot, error in
+        
+        let moreLists = database.collection(collectionName).document(docID).addSnapshotListener { documentSnapshot, error in
                 
             guard let document = documentSnapshot, let _ = document.data() else {
                 print("setupListenerForMessageThread: Error fetching document: \(docID)")
@@ -104,9 +105,9 @@ class FirebaseService: ObservableObject {
             moreListsListener = moreLists
     }
     
-    func getSavedListsForUser(userId: String) async throws -> MoreLists? {
+    func getListsForUser(userId: String, collectionName: String) async throws -> MoreLists? {
         
-        let document = try await database.collection("savedLists").document(userId).getDocument()
+        let document = try await database.collection(collectionName).document(userId).getDocument()
         if document.exists {
             let lists = MoreLists(snapshot: document.data() ?? [:])
             return lists
@@ -202,21 +203,21 @@ class FirebaseService: ObservableObject {
         }
     }
     
-    func deleteMoreItem(userId: String, listName: String, item: String) async {
+    func deleteMoreItem(userId: String, listName: String, item: String, collectionName: String) async {
         
         let value = [
                     listName : FieldValue.arrayRemove([item])
                     ]
         do {
-            try await database.collection("moreLists").document(userId).updateData(value)
+            try await database.collection(collectionName).document(userId).updateData(value)
         } catch {
             debugPrint(String.boom, "deleteItem moreLists: \(error)")
         }
     }
     
-    func deleteFieldFromMoreItems(docID: String, listName: String) async -> Bool {
+    func deleteFieldFromMoreItems(docID: String, listName: String, collectionName: String) async -> Bool {
         do {
-          try await database.collection("moreLists").document(docID).updateData([
+          try await database.collection(collectionName).document(docID).updateData([
             listName: FieldValue.delete(),
           ])
             return true
@@ -226,13 +227,13 @@ class FirebaseService: ObservableObject {
         }
     }
     
-    func updateItemsForMoreItems(userId: String, listName: String, item: String) async {
+    func updateItemsForMoreItems(userId: String, listName: String, item: String, collectionName: String) async {
         
         let value = [
                     listName : FieldValue.arrayUnion([item])
                     ]
         do {
-            try await database.collection("moreLists").document(userId).updateData(value)
+            try await database.collection(collectionName).document(userId).updateData(value)
         } catch {
             debugPrint(String.boom, "updateItemsForMoreItems: \(error)")
         }

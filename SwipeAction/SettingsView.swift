@@ -11,7 +11,6 @@ import FirebaseAuth
 struct SettingsView: View {
     @EnvironmentObject var userAuth: Authentication
     @State var showSignOut = false
-    @State var showDefaultSheet = false
     @State var showProfileSheet = false
     
     var body: some View {
@@ -26,12 +25,6 @@ struct SettingsView: View {
                 }
                 .buttonStyle(PlainTextButtonStyle())
                 .padding(.top)
-                Button {
-                    showDefaultSheet = true
-                } label: {
-                    Text("Default List")
-                }
-                .buttonStyle(PlainTextButtonStyle())
                 Button("Sign Out") {
                     showSignOut = true
                 }
@@ -52,9 +45,6 @@ struct SettingsView: View {
                 Spacer()
             }
             .padding([.leading, .trailing])
-            .fullScreenCover(isPresented: $showDefaultSheet) {
-                ListItemsView(key: ListItemType.defaultItems, title: "Default Items", showShare: false, showDone: true, showRestore: true)
-            }
             .fullScreenCover(isPresented: $showProfileSheet) {
                 ProfileView()
             }
