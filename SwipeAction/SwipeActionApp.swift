@@ -9,11 +9,17 @@ import SwiftUI
 import FirebaseCore
 import FirebaseMessaging
 import GoogleSignIn
+import FirebaseAuth
 
 class AppDelegate: NSObject,  UIApplicationDelegate, MessagingDelegate, UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
+        do {
+            try Auth.auth().useUserAccessGroup("DDDAQ32TPA.com.breakawaydesign.SwipeAction")
+        } catch {
+            debugPrint(String.boom, "Auth.auth().useUserAccessGroup failed: \(error.localizedDescription)")
+        }
         Messaging.messaging().delegate = self
 
         UNUserNotificationCenter.current().delegate = self

@@ -24,13 +24,13 @@ struct LargeSizeView: View {
             .clipped()
             .shadow(radius: 5)
         }
-        ForEach(0..<10, id:\.self) { _ in
+        ForEach(entry.items, id: \.id) { item in
             HStack {
-                Image(systemName: "checkmark.circle")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 30, height: 30)
-                Text("My Lists")
+//                Image(systemName: "checkmark.circle")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(width: 30, height: 30)
+                Text(item.name)
                 Spacer()
             }
             .padding(.horizontal)

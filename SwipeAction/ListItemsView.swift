@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 struct ListItemsView: View {
     @EnvironmentObject var firebaseService: FirebaseService
@@ -90,6 +91,7 @@ struct ListItemsView: View {
                                     }
                                 }
                         }
+                        .frame(minHeight: 50, maxHeight:100)
                         .onTapGesture {
                             if let index = items.firstIndex(where: { $0.id == item.id }) {
                                 items[index].isStrikethrough.toggle()
@@ -320,6 +322,7 @@ struct ListItemsView: View {
                     let array = processUsers(userId: userId, listType: key, users: items)
                     DispatchQueue.main.async {
                         self.items = array
+                        WidgetCenter.shared.reloadAllTimelines()
                     }
                 }
             }

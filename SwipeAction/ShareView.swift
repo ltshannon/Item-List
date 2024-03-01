@@ -7,12 +7,6 @@
 
 import SwiftUI
 
-struct NameList: Codable, Identifiable, Hashable {
-    var id: String
-    var name: String
-    var imageName = "circle"
-}
-
 struct ShareView: View {
     @EnvironmentObject var firebaseService: FirebaseService
     @EnvironmentObject var userAuth: Authentication

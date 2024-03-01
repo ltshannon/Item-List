@@ -23,6 +23,18 @@ struct UserInformation: Codable, Identifiable, Hashable {
     var defaultItems: [String]?
 }
 
+enum ListItemType: String {
+    case currentItems = "currentItems"
+    case defaultItems = "defaultItems"
+    case sharedItems = "sharedItems"
+}
+
+struct NameList: Codable, Identifiable, Hashable {
+    var id: String
+    var name: String
+    var imageName = "circle"
+}
+
 struct MoreLists: Codable, Identifiable, Hashable {
     @DocumentID var id: String?
     var listNames: [NameList] = []
@@ -90,7 +102,6 @@ class FirebaseService: ObservableObject {
     
     func getMoreLists(docID: String, collectionName: String) {
         
-        
         let moreLists = database.collection(collectionName).document(docID).addSnapshotListener { documentSnapshot, error in
                 
             guard let document = documentSnapshot, let _ = document.data() else {
@@ -114,6 +125,24 @@ class FirebaseService: ObservableObject {
         }
         return nil
 
+    }
+    
+    func getUserDataForWidget() async -> UserInformation? {
+        
+        guard let user = Auth.auth().currentUser else {
+            return nil
+        }
+        do {
+            let document = try await database.collection("users").document(user.uid).getDocument()
+            if document.exists {
+                let data = try document.data(as: UserInformation.self)
+                return data
+            }
+            return nil
+        } catch {
+            debugPrint(String.boom, "getUserDataForWidget failed: \(error.localizedDescription)")
+        }
+        return nil
     }
     
     func getSharedUsers() async {

@@ -8,7 +8,8 @@
 import WidgetKit
 
 struct SimpleEntry: TimelineEntry {
+    let id = UUID().uuidString
     let date: Date
-    let emoji: String
+    var items: [NameList]
 }
 

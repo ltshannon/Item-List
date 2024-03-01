@@ -7,8 +7,19 @@
 
 import WidgetKit
 import SwiftUI
+import Firebase
 
 struct MyListsWidget: Widget {
+    
+    init() {
+        FirebaseApp.configure()
+        do {
+            try Auth.auth().useUserAccessGroup("DDDAQ32TPA.com.breakawaydesign.SwipeAction")
+        } catch {
+            debugPrint(String.boom, "Auth.auth().useUserAccessGroup failed: \(error.localizedDescription)")
+        }
+    }
+
     let kind: String = "MyListsWidget"
 
     var body: some WidgetConfiguration {
@@ -22,7 +33,7 @@ struct MyListsWidget: Widget {
                     .background()
             }
         }
-        .supportedFamilies([.systemMedium, .systemLarge])
+        .supportedFamilies([.systemLarge, .accessoryRectangular])
         .configurationDisplayName("My Lists")
         .description("View your current list")
     }
@@ -31,6 +42,6 @@ struct MyListsWidget: Widget {
 #Preview(as: .systemSmall) {
     MyListsWidget()
 } timeline: {
-    SimpleEntry(date: .now, emoji: "😀")
-    SimpleEntry(date: .now, emoji: "🤩")
+    SimpleEntry(date: .now, items: [])
+    SimpleEntry(date: .now, items: [])
 }
