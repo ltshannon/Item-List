@@ -42,6 +42,9 @@ struct ContentView: View {
                 showSignIn = true
             }
             if state == .loggedIn {
+                Task {
+                    await firebaseService.createUser(token: userAuth.fcmToken)
+                }
                 showSignIn = false
             }
         }

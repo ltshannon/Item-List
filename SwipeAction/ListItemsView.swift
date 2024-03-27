@@ -311,7 +311,7 @@ struct ListItemsView: View {
             }
             .onAppear {
                 if firstTime {
-                    if firebaseService.userListener == nil {
+                    if firebaseService.userListener == nil && userAuth.state == .loggedIn {
                         firebaseService.getUsers()
                     }
                     firstTime = false

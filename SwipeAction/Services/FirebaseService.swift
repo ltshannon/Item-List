@@ -72,6 +72,44 @@ class FirebaseService: ObservableObject {
     @Published var moreLists: MoreLists = MoreLists()
     var moreListsListener: ListenerRegistration?
     var userListener: ListenerRegistration?
+    var fmc: String = ""
+    
+    
+    func createUser(token: String) async {
+        
+        guard let user = Auth.auth().currentUser else {
+            return
+        }
+        
+        var data = ["userId": user.uid]
+        do {
+            try await database.collection("savedLists").document(user.uid).updateData(data)
+            debugPrint(String.bell, "createUser: savedLists successfully written!")
+        } catch {
+            debugPrint(String.fatal, "createUser: Error writing savedLists: \(error)")
+            return
+        }
+        
+        do {
+            try await database.collection("moreLists").document(user.uid).updateData(data)
+            debugPrint(String.bell, "createUser: moreLists successfully written!")
+        } catch {
+            debugPrint(String.fatal, "createUser: Error writing moreLists: \(error)")
+            return
+        }
+        
+        data = ["email": user.email ?? "no email",
+                "displayName": user.displayName ?? user.uid,
+                "fcm": token
+               ]
+        do {
+            try await database.collection("users").document(user.uid).updateData(data)
+            debugPrint(String.bell, "users: moreLists successfully written!")
+        } catch {
+            debugPrint(String.fatal, "users: Error writing moreLists: \(error)")
+            return
+        }
+    }
     
     func getUsers() {
         
@@ -173,6 +211,8 @@ class FirebaseService: ObservableObject {
     
     func updateAddFCMToUser(token: String) async {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        
+        self.fmc = token
         
         let values = [
                         "fcm" : token,

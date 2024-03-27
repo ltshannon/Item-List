@@ -71,10 +71,6 @@ class Authentication: ObservableObject {
                     self.firebaseUserId = user?.uid ?? ""
                     self.email = email
                 }
-                //                Task {
-                //                    await self.firebaseService.updateAddUsersDocument(token: self.fcmToken.isNotEmpty ? self.fcmToken : nil)
-                //                }
-                
             case .loggedOut:
                 break
             }
@@ -88,6 +84,10 @@ class Authentication: ObservableObject {
                 }
             }
         }
+    }
+    
+    func setUser(user: User) {
+        self.user = user
     }
 }
 
